@@ -1,0 +1,39 @@
+.compat-table-container {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+}
+
+.compat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: monospace;
+}
+
+.compat-table th,
+.compat-table td {
+    padding: 0.75rem;
+    border: 1px solid #e1e4e8;
+    text-align: center;
+}
+
+.compat-table th {
+    background-color: #f6f8fa;
+    font-weight: 600;
+}
+
+.compat-yes {
+    background-color: #e6ffec;
+    color: #22863a;
+}
+
+.compat-no {
+    background-color: #ffebe9;
+    color: #cb2431;
+}
+
+.compat-table-error {
+    padding: 1rem;
+    background-color: #ffebe9;
+    border: 1px solid #ffd7d5;
+    border-radius: 4px;
+}

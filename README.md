@@ -1,6 +1,6 @@
 # @diplodoc/mdx-extension
 
-[![npm version](https://badge.fury.io/js/@diplodoc%2Fmdx-extension.svg)](https://badge.fury.io/js/@diplodoc%2Fmdx-extension)
+[![npm version](https://img.shields.io/npm/v/@diplodoc/mdx-extension?logo=npm)](https://www.npmjs.com/package/@diplodoc/mdx-extension)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 MDX extension for Diplodoc's markdown transformer that allows embedding MDX/JSX components within markdown content.

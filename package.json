@@ -1,7 +1,6 @@
 {
   "name": "@diplodoc/mdx-extension",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
   "scripts": {
     "prepare": "husky",
     "lint:js": "eslint --ext .js,.ts .",
@@ -12,7 +11,15 @@
     "lint:fix": "npm run lint:js:fix && npm run lint:prettier:fix && npm run typecheck",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "prepublishOnly": "npm run build && npm pkg delete engines"
+    "prepublishOnly": "npm run build && npm pkg delete engines",
+    "test": "cd tests && npm ci && npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:diplodoc-platform/mdx-extension.git"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "type": "module",
   "module": "./build/esm/index.js",

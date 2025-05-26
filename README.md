@@ -125,7 +125,7 @@ function ServerPage({ html, mdxArtifacts }) {
   });
 
   const innerHtml = useMemo(() => {
-    return {__html: html};
+    return { __html: html };
   }, [html]);
 
   return <div ref={ref} dangerouslySetInnerHTML={innerHtml}></div>;

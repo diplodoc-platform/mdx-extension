@@ -1,7 +1,5 @@
-## 1.0.1
+## 1.0.0 (2025-05-26)
 
-Bump release
-
-## 1.0.0
+### Features
 
 Initial release.

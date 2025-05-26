@@ -22,6 +22,7 @@
     "access": "public"
   },
   "type": "module",
+  "main": "./build/esm/index.js",
   "module": "./build/esm/index.js",
   "dependencies": {
     "@mdx-js/mdx": "^3.1.0",

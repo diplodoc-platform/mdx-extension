@@ -78,7 +78,7 @@ function App() {
     mdxArtifacts,
   });
 
-  return <div ref={ref} />;
+  return <div ref={ref}></div>;
 }
 ```
 
@@ -124,7 +124,11 @@ function ServerPage({ html, mdxArtifacts }) {
     html,
   });
 
-  return <div ref={ref} />;
+  const innerHtml = useMemo(() => {
+    return {__html: html};
+  }, [html]);
+
+  return <div ref={ref} dangerouslySetInnerHTML={innerHtml}></div>;
 }
 ```
 
@@ -182,7 +186,6 @@ Creates an SSR renderer function for server-side processing.
 
 ```markdown
 <>
-
   <div>Fragment content</div>
 </>
 ```
@@ -191,7 +194,7 @@ Creates an SSR renderer function for server-side processing.
 
 ```markdown
 <Button onClick={() => console.log('click')}>
-Click me
+  Click me
 </Button>
 ```
 

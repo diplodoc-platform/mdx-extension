@@ -1,37 +1,84 @@
-import type { MDXComponents, MDXProps } from "mdx/types";
-import { compileSync, runSync } from "@mdx-js/mdx";
+import type { MDXComponents } from "mdx/types";
+import { type CompileOptions, compileSync, runSync } from "@mdx-js/mdx";
 import * as runtime from "react/jsx-runtime";
 import React from "react";
 import type { MdxArtifacts } from "../types";
-import { MDX_PREFIX } from "../constants";
+import { MDX_PREFIX, TAG_NAME } from "../constants";
 import { renderToString } from "react-dom/server";
+import { escapeAttribute, isEmptyObject, wrapObject } from "./common";
+import { MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue } from "../context";
 
 interface GetSsrRendererProps {
   components?: MDXComponents;
+  pureComponents?: MDXComponents;
+  compileOptions?: CompileOptions;
 }
 
-const getSsrRenderer = async ({ components }: GetSsrRendererProps) => {
-  const render = (id: string, mdx: string, props?: MDXProps) => {
+const getSsrRenderer = async ({
+  components,
+  pureComponents,
+  compileOptions,
+}: GetSsrRendererProps) => {
+  const componentsNames = Object.keys(components || {});
+  const usedComponents = new Set<string>();
+  const combinedComponents = wrapObject(
+    {
+      ...components,
+      ...pureComponents,
+    },
+    (name) => usedComponents.add(name),
+  );
+
+  const render = (id: string, mdx: string) => {
     const vFile = compileSync(mdx, {
+      ...compileOptions,
       outputFormat: "function-body",
     });
 
-    const { default: Component } = runSync(vFile, {
-      ...runtime,
-    });
+    const { default: Component } = runSync(vFile, runtime);
 
-    const code = vFile.toString();
+    let code: string | undefined = vFile.toString();
+
+    const state = {};
+    const setState = (value: MdxStateCtxValue) => {
+      Object.assign(state, value);
+    };
 
     const options = {
       identifierPrefix: id,
     };
-    const html = renderToString(
-      React.createElement("span", {
+
+    usedComponents.clear();
+    let html = renderToString(
+      React.createElement(TAG_NAME, {
         className: id,
-        children: React.createElement(Component, props),
+        children: React.createElement(MdxSetStateCtx.Provider, {
+          value: setState,
+          children: React.createElement(MdxStateCtx.Provider, {
+            value: state,
+            children: React.createElement(Component, {
+              components: combinedComponents,
+            }),
+          }),
+        }),
       }),
       options,
     );
+    if (!isEmptyObject(state)) {
+      html = html.replace(
+        `${TAG_NAME} `,
+        `${TAG_NAME} data-mdx-state="${escapeAttribute(JSON.stringify(state))}" `,
+      );
+    }
+    const withComponents = componentsNames.some((name) =>
+      usedComponents.has(name),
+    );
+    if (!withComponents) {
+      const endOpenSpan = html.indexOf(">");
+      const startCloseSpan = html.lastIndexOf("<");
+      html = html.slice(endOpenSpan + 1, startCloseSpan);
+      code = undefined;
+    }
 
     return { html, code };
   };
@@ -41,10 +88,10 @@ const getSsrRenderer = async ({ components }: GetSsrRendererProps) => {
   const getHtml = (mdx: string, mdxArtifacts: MdxArtifacts) => {
     const { idMdx } = mdxArtifacts;
     const id = `${MDX_PREFIX}${++idx}`;
-    const { html, code } = render(id, mdx, {
-      components,
-    });
-    idMdx[id] = code;
+    const { html, code } = render(id, mdx);
+    if (code) {
+      idMdx[id] = code;
+    }
     return html;
   };
 

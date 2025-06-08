@@ -3,6 +3,11 @@ export const CONTENT = `
 
 This page demonstrates the capabilities of \`@diplodoc/mdx-extension\` for embedding MDX/JSX within markdown content.
 
+## Sum
+
+1 + 2 = <Sum a={1} b={2} />
+
+
 ## Basic Usage
 
 ### 1. Simple JSX Component

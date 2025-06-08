@@ -7,11 +7,23 @@ interface UseMdxProps {
   html: string;
   refCtr: React.MutableRefObject<HTMLElement | null>;
   components?: MDXComponents;
+  pureComponents?: MDXComponents;
   mdxArtifacts?: MdxArtifacts;
 }
 
-const useMdx = ({ refCtr, html, components, mdxArtifacts }: UseMdxProps) => {
+const useMdx = ({
+  refCtr,
+  html,
+  components,
+  pureComponents,
+  mdxArtifacts,
+}: UseMdxProps) => {
   const refUmount = React.useRef(() => {});
+
+  const combinedComponents = React.useMemo(
+    () => ({ ...components, ...pureComponents }),
+    [components, pureComponents],
+  );
 
   // building mdx scripts into components
   const idMdxComponent = React.useMemo(
@@ -56,9 +68,9 @@ const useMdx = ({ refCtr, html, components, mdxArtifacts }: UseMdxProps) => {
     refUmount.current = renderMdxComponents({
       idMdxComponent,
       ctr,
-      components,
+      components: combinedComponents,
     });
-  }, [refCtr, html, components, idMdxComponent]);
+  }, [refCtr, html, combinedComponents, idMdxComponent]);
 };
 
 export default useMdx;

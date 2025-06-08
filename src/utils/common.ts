@@ -3,6 +3,7 @@ import { type Root, createRoot, hydrateRoot } from "react-dom/client";
 import * as runtime from "react/jsx-runtime";
 import React from "react";
 import type { MDXComponents, MDXProps } from "mdx/types";
+import { MdxStateCtx } from "../context";
 
 const nodeRootMap = new WeakMap<Element, Root>();
 const nodeWillUmount = new WeakMap<Element, boolean>();
@@ -21,19 +22,26 @@ export const renderMdxComponents = ({
   components,
 }: RenderMdxComponentsProps) => {
   const unmountFns = Object.entries(idMdxComponent).map(([id, Content]) => {
-    let node = ctr.querySelector(`.${id}`);
+    let node = ctr.querySelector<HTMLElement>(`.${id}`);
     if (!node) {
       throw new Error("node is null");
     }
 
     if (nodeWillUmount.get(node) && node.parentNode) {
-      const newNode = node.cloneNode(true) as Element;
+      const newNode = node.cloneNode(true) as HTMLElement;
       node.parentNode.replaceChild(newNode, node);
       node = newNode;
     }
 
-    const reactNode = React.createElement(Content, {
-      components,
+    const mdxState = node?.dataset?.mdxState
+      ? JSON.parse(node.dataset.mdxState)
+      : {};
+
+    const reactNode = React.createElement(MdxStateCtx.Provider, {
+      value: mdxState,
+      children: React.createElement(Content, {
+        components,
+      }),
     });
 
     let root = nodeRootMap.get(node);
@@ -70,3 +78,36 @@ export const idMdxToComponents = (idMdx?: Record<string, string>) => {
     return acc;
   }, {});
 };
+
+export function wrapObject<T extends Object>(
+  obj: T,
+  onGet: (name: string) => void,
+) {
+  return Object.entries(obj).reduce<T>((acc, [key, value]) => {
+    Object.defineProperty(acc, key, {
+      get: () => {
+        onGet(key);
+        return value;
+      },
+      enumerable: true,
+    });
+    return acc;
+  }, {} as T);
+}
+
+export function escapeAttribute(value: unknown) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+export function isEmptyObject(obj: Object) {
+  // eslint-disable-next-line guard-for-in
+  for (const _key in obj) {
+    return false;
+  }
+  return true;
+}

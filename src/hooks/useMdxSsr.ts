@@ -7,6 +7,7 @@ interface UseMdxSsrProps {
   html: string;
   refCtr: React.MutableRefObject<HTMLElement | null>;
   components?: MDXComponents;
+  pureComponents?: MDXComponents;
   mdxArtifacts?: MdxArtifacts;
 }
 
@@ -15,8 +16,14 @@ const useMdxSsr = ({
   refCtr,
   mdxArtifacts,
   components,
+  pureComponents,
 }: UseMdxSsrProps) => {
   const refUmount = React.useRef(() => {});
+
+  const combinedComponents = React.useMemo(
+    () => ({ ...components, ...pureComponents }),
+    [components, pureComponents],
+  );
 
   // building mdx scripts into components
   const idMdxComponent = React.useMemo(
@@ -39,10 +46,10 @@ const useMdxSsr = ({
     refUmount.current = renderMdxComponents({
       idMdxComponent,
       ctr,
-      components,
+      components: combinedComponents,
       isSSR: true,
     });
-  }, [html, refCtr, components, idMdxComponent]);
+  }, [html, refCtr, combinedComponents, idMdxComponent]);
 };
 
 export default useMdxSsr;

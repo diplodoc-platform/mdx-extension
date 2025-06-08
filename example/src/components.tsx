@@ -14,3 +14,7 @@ export const COMPONENTS = {
     CompatTable,
     MermaidDiagram,
 };
+
+export const PURE_COMPONENTS = {
+    Sum: ({a, b}: {a: number; b: number}) => a + b,
+};

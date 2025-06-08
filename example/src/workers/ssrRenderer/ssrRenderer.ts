@@ -5,7 +5,7 @@ import DefaultPlugins from '@diplodoc/transform/lib/plugins';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {MdxPluginEnv, getSsrRenderer, mdxPlugin} from '@plugin';
 import type {OutputType} from '@diplodoc/transform/lib/typings';
-import {COMPONENTS} from '@/components';
+import {COMPONENTS, PURE_COMPONENTS} from '@/components';
 
 export interface SsrRendererWorker {
     getContent: typeof getContent;
@@ -14,6 +14,7 @@ export interface SsrRendererWorker {
 const getContent = async (content: string) => {
     const render = await getSsrRenderer({
         components: COMPONENTS,
+        pureComponents: PURE_COMPONENTS,
     });
 
     const {

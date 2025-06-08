@@ -1,1 +1,1 @@
-export * from '@gravity-ui/prettier-config';
+export * from "@gravity-ui/prettier-config";

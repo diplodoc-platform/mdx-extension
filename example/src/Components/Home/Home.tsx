@@ -3,7 +3,7 @@ import React, {FC, useRef} from 'react';
 import '@diplodoc/transform/dist/css/yfm.css';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {MdxArtifacts, useMdxSsr} from '@plugin';
-import {COMPONENTS} from '@/components';
+import {COMPONENTS, PURE_COMPONENTS} from '@/components';
 
 interface HomeProps {
     html: string;
@@ -13,7 +13,13 @@ interface HomeProps {
 const Home: FC<HomeProps> = ({html, mdxArtifacts}) => {
     const refYfm = useRef<HTMLDivElement>(null);
 
-    useMdxSsr({refCtr: refYfm, components: COMPONENTS, mdxArtifacts, html});
+    useMdxSsr({
+        refCtr: refYfm,
+        components: COMPONENTS,
+        pureComponents: PURE_COMPONENTS,
+        mdxArtifacts,
+        html,
+    });
 
     const innerHtml = React.useMemo(() => {
         return {__html: html};

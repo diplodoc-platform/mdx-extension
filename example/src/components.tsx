@@ -3,11 +3,12 @@ import {CompatTable} from '@/Components/CompatTable/CompatTable';
 import MermaidDiagram from '@/Components/MermaidDiagram/MermaidDiagram';
 import {Counter} from '@/Components/Counter/Counter';
 import {TabLocal, TabsLocal} from '@/Components/Tabs/Tabs';
+import {withInitProps} from '@plugin';
 
 export const COMPONENTS = {
     Alert,
     Button,
-    Counter,
+    Counter: withInitProps(Counter, async () => ({initialValue: 10})),
     Tabs: TabsLocal,
     Tab: TabLocal,
     Label,

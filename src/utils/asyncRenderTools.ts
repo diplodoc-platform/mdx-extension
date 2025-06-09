@@ -48,7 +48,7 @@ export const getComponentInitProps = async (
   const componentList = Object.values(components);
   const componentNameList = Object.keys(components);
 
-  const keyInitFnList: Record<string, () => Promise<void>> = {};
+  const keyInitFnList: (() => Promise<void>)[] = [];
   const keyInitFnResult: Record<string, {}> = {};
   const fakeJsx = (
     mdxComponent: MDXComponents["string"],
@@ -63,10 +63,11 @@ export const getComponentInitProps = async (
       const uKey = getPropsKey(name, props as ComponentBaseProps);
       const fn = getInitPropsFn(component);
       if (fn) {
-        keyInitFnList[uKey] = () =>
+        keyInitFnList.push(() =>
           fn(props).then((p) => {
             keyInitFnResult[uKey] = p;
-          });
+          }),
+        );
 
         renderComponents[name] = (propsLocal) => {
           const uKeyLocal = getPropsKey(name, propsLocal as ComponentBaseProps);
@@ -85,7 +86,7 @@ export const getComponentInitProps = async (
   trackComponent({ components: components });
 
   const initComponents = async () => {
-    await Promise.all(Object.values(keyInitFnList).map((fn) => fn()));
+    await Promise.all(keyInitFnList.map((fn) => fn()));
   };
 
   return { initComponents, renderComponents, usedComponents };

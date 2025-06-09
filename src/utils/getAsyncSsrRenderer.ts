@@ -51,7 +51,6 @@ const getAsyncSsrRenderer = async ({
       identifierPrefix: id,
     };
 
-    usedComponents.clear();
     let html = renderToString(
       React.createElement(TAG_NAME, {
         className: id,

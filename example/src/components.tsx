@@ -4,6 +4,8 @@ import MermaidDiagram from '@/Components/MermaidDiagram/MermaidDiagram';
 import {Counter} from '@/Components/Counter/Counter';
 import {TabLocal, TabsLocal} from '@/Components/Tabs/Tabs';
 import {withInitProps} from '@plugin';
+import KatexFormula from '@/Components/KatexFormula/KatexFormula';
+import {initProps} from '@/Components/KatexFormula/initProps';
 
 export const COMPONENTS = {
     Alert,
@@ -18,4 +20,5 @@ export const COMPONENTS = {
 
 export const PURE_COMPONENTS = {
     Sum: ({a, b}: {a: number; b: number}) => a + b,
+    KatexFormula: withInitProps(KatexFormula, initProps),
 };

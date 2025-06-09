@@ -143,7 +143,7 @@ Renders:
   }}
 </CompatTable>
 
-### Диаграмма последовательности
+### Mermaid Diagram
 
 \`\`\`markdown
 <MermaidDiagram>
@@ -164,6 +164,20 @@ Renders:
     User->>API: GET /data
     API-->>User: 200 OK\`}
 </MermaidDiagram>
+
+### Katex Formula
+
+\`\`\`markdown
+<KatexFormula>
+  {\`\\\\$x = {-b \\\\pm \\\\sqrt{b^2 - 4ac}} \\\\over {2a}\\\\$\`}
+</KatexFormula>
+\`\`\`
+
+Renders:  
+
+<KatexFormula>
+  {\`\\\\$x = {-b \\\\pm \\\\sqrt{b^2 - 4ac}} \\\\over {2a}\\\\$\`}
+</KatexFormula>
 
 ## Limitations
 

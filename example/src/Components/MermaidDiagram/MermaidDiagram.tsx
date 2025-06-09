@@ -1,16 +1,17 @@
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC, useLayoutEffect, useState} from 'react';
 import mermaid from 'mermaid';
-import './MermaidDiagram.scss';
 import {Skeleton} from '@gravity-ui/uikit';
+import './MermaidDiagram.scss';
 
 interface MermaidDiagramProps {
     children: string;
+    skeletonHeight?: number;
 }
 
-const MermaidDiagram: FC<MermaidDiagramProps> = ({children}) => {
+const MermaidDiagram: FC<MermaidDiagramProps> = ({children, skeletonHeight = 10}) => {
     const [svg, setSvg] = useState('');
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         (async () => {
             try {
                 // Инициализируем Mermaid
@@ -36,7 +37,7 @@ const MermaidDiagram: FC<MermaidDiagramProps> = ({children}) => {
     return (
         <div className="mermaid-container">
             {!svg ? (
-                <Skeleton style={{height: '271px'}} />
+                <Skeleton style={{height: `${skeletonHeight}px`}} />
             ) : (
                 <div className="mermaid-ctr" dangerouslySetInnerHTML={{__html: svg}} />
             )}

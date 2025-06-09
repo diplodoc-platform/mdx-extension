@@ -3,11 +3,6 @@ export const CONTENT = `
 
 This page demonstrates the capabilities of \`@diplodoc/mdx-extension\` for embedding MDX/JSX within markdown content.
 
-## Sum
-
-1 + 2 = <Sum a={1} b={2} />
-
-
 ## Basic Usage
 
 ### 1. Simple JSX Component
@@ -146,7 +141,7 @@ Renders:
 ### Mermaid Diagram
 
 \`\`\`markdown
-<MermaidDiagram>
+<MermaidDiagram skeletonHeight={271}>
   {\`sequenceDiagram
     participant User
     participant API
@@ -157,7 +152,7 @@ Renders:
 
 Renders:  
 
-<MermaidDiagram>
+<MermaidDiagram skeletonHeight={271}>
   {\`sequenceDiagram
     participant User
     participant API
@@ -169,14 +164,14 @@ Renders:
 
 \`\`\`markdown
 <KatexFormula>
-  {\`\\\\$x = {-b \\\\pm \\\\sqrt{b^2 - 4ac}} \\\\over {2a}\\\\$\`}
+  {\`E = mc^2\`}
 </KatexFormula>
 \`\`\`
 
 Renders:  
 
 <KatexFormula>
-  {\`\\\\$x = {-b \\\\pm \\\\sqrt{b^2 - 4ac}} \\\\over {2a}\\\\$\`}
+  {"E = mc^2"}
 </KatexFormula>
 
 ## Limitations

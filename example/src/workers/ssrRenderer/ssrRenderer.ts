@@ -3,7 +3,7 @@ import {expose} from 'threads/worker';
 import transform from '@diplodoc/transform';
 import DefaultPlugins from '@diplodoc/transform/lib/plugins';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {mdxPlugin, MdxPluginEnv} from '@plugin';
+import {MdxPluginEnv, mdxPlugin} from '@plugin';
 import type {OutputType} from '@diplodoc/transform/lib/typings';
 import {COMPONENTS, PURE_COMPONENTS} from '@/components';
 import getAsyncSsrRenderer from '../../../../src/utils/getAsyncSsrRenderer';

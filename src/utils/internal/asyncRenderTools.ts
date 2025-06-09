@@ -4,7 +4,6 @@ import {run} from '@mdx-js/mdx';
 
 export type ComponentBaseProps = {
     children?: React.ReactNode;
-    key?: string;
 };
 
 export const componentGetInitProps = new WeakMap<
@@ -30,10 +29,10 @@ export const getComponentInitProps = async (
     vFile: Parameters<typeof run>[0],
 ) => {
     const usedComponents = new Set<string>();
-    const renderComponents: MDXComponents = {...components};
     const componentList = Object.values(components);
     const componentNameList = Object.keys(components);
 
+    const componentsOverrides: MDXComponents = {};
     const keyInitFnList: (() => Promise<void>)[] = [];
     const keyInitFnResult: Record<string, {}> = {};
     const fakeJsx = (mdxComponent: MDXComponents['string'], props: ComponentBaseProps) => {
@@ -45,15 +44,16 @@ export const getComponentInitProps = async (
 
             const fn = getInitPropsFn(component);
             if (fn) {
-                const uKey = getPropsKey(name, props as ComponentBaseProps);
+                const uKey = getPropsKey(name, props);
+
                 keyInitFnList.push(() =>
                     fn(props).then((p) => {
                         keyInitFnResult[uKey] = p;
                     }),
                 );
 
-                renderComponents[name] = (propsLocal) => {
-                    const uKeyLocal = getPropsKey(name, propsLocal as ComponentBaseProps);
+                componentsOverrides[name] = (propsLocal) => {
+                    const uKeyLocal = getPropsKey(name, propsLocal);
                     return React.createElement(component, keyInitFnResult[uKeyLocal]);
                 };
             }
@@ -71,6 +71,11 @@ export const getComponentInitProps = async (
     const initComponents = async () => {
         await Promise.all(keyInitFnList.map((fn) => fn()));
     };
+
+    let renderComponents = components;
+    if (keyInitFnList.length) {
+        renderComponents = {...components, ...componentsOverrides};
+    }
 
     return {initComponents, renderComponents, usedComponents};
 };

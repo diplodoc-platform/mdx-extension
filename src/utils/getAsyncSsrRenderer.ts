@@ -38,9 +38,7 @@ const getAsyncSsrRenderer = async ({
             vFile,
         );
 
-        await initComponents();
-
-        const {default: Component} = await run(vFile, runtime);
+        const [{default: Component}] = await Promise.all([run(vFile, runtime), initComponents()]);
 
         let code: string | undefined = vFile.toString();
 

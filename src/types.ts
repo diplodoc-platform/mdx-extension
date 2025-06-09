@@ -10,6 +10,6 @@ export interface MdxPluginEnv {
 
 export type MDXRenderer = (mdx: string, mdxArtifacts: MdxArtifacts) => string;
 
-export interface MDXGetInitialProps<P = Record<string, unknown>> {
-    (props: P, mdxSate: MdxStateCtxValue): Promise<P> | P;
+export interface MDXGetInitialProps<P = Record<string, unknown>, R = P> {
+    (props: R, mdxSate: MdxStateCtxValue): Promise<P> | P;
 }

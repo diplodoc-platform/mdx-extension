@@ -5,7 +5,7 @@ import {Counter} from '@/Components/Counter/Counter';
 import {TabLocal, TabsLocal} from '@/Components/Tabs/Tabs';
 import KatexFormula from '@/Components/KatexFormula/KatexFormula';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {withInitProps} from '@plugin';
+import {withInitialProps} from '@plugin';
 import {getInitialProps} from '@/Components/Counter/getInitialProps';
 
 export const COMPONENTS = {
@@ -18,7 +18,7 @@ export const COMPONENTS = {
 
 export const SSR_COMPONENTS = {
     ...COMPONENTS,
-    Counter: withInitProps(Counter, getInitialProps),
+    Counter: withInitialProps(Counter, getInitialProps),
 };
 
 export const PURE_COMPONENTS = {

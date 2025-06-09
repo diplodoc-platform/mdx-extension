@@ -1,6 +1,6 @@
 import React from 'react';
 import type {MdxArtifacts} from '../types';
-import {idMdxToComponents, renderMdxComponents} from '../utils/common';
+import {idMdxToComponents, renderMdxComponents} from '../utils/internal/common';
 import type {MDXComponents} from 'mdx/types';
 
 interface UseMdxSsrProps {

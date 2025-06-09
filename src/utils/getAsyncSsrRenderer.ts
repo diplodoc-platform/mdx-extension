@@ -5,9 +5,9 @@ import React from 'react';
 import type {MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {escapeAttribute, isEmptyObject} from './common';
+import {escapeAttribute, isEmptyObject} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
-import {generateUniqueId, getComponentInitProps} from './asyncRenderTools';
+import {generateUniqueId, getComponentInitProps} from './internal/asyncRenderTools';
 
 interface GetSsrRendererProps {
     components?: MDXComponents;

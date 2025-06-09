@@ -5,7 +5,7 @@ import React from 'react';
 import type {MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {escapeAttribute, isEmptyObject, wrapObject} from './common';
+import {escapeAttribute, isEmptyObject, wrapObject} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 
 interface GetSsrRendererProps {

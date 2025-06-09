@@ -3,7 +3,7 @@ import {type Root, createRoot, hydrateRoot} from 'react-dom/client';
 import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import type {MDXComponents, MDXProps} from 'mdx/types';
-import {MdxStateCtx} from '../context';
+import {MdxStateCtx} from '../../context';
 
 const nodeRootMap = new WeakMap<Element, Root>();
 const nodeWillUmount = new WeakMap<Element, boolean>();

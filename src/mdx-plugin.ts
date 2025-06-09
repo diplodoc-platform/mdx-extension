@@ -5,7 +5,7 @@ import type {MdxArtifacts, MdxPluginEnv} from './types';
 import getRender from './utils/getRender';
 import type {RuleCore} from 'markdown-it/lib/parser_core';
 import type {Token} from 'markdown-it';
-import {findMatchingClosingTag} from './utils/plugin';
+import {findMatchingClosingTag} from './utils/internal/plugin';
 
 interface Options {
     render?: (mdx: string, mdxArtifacts: MdxArtifacts) => string;

@@ -141,7 +141,7 @@ Renders:
 ### Mermaid Diagram
 
 \`\`\`markdown
-<MermaidDiagram skeletonHeight={271}>
+<MermaidDiagram skeletonHeight={266}>
   {\`sequenceDiagram
     participant User
     participant API
@@ -152,7 +152,7 @@ Renders:
 
 Renders:  
 
-<MermaidDiagram skeletonHeight={271}>
+<MermaidDiagram skeletonHeight={266}>
   {\`sequenceDiagram
     participant User
     participant API

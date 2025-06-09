@@ -33,7 +33,7 @@ export const renderMdxComponents = ({
             node = newNode;
         }
 
-        const mdxState = node?.dataset?.mdxState ? JSON.parse(node.dataset.mdxState) : {};
+        const mdxState = node?.dataset?.mdxState ? JSON.parse(node.dataset.mdxState) : null;
 
         const reactNode = React.createElement(MdxStateCtx.Provider, {
             value: mdxState,

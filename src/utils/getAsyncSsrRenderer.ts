@@ -38,14 +38,17 @@ const getAsyncSsrRenderer = async ({
             vFile,
         );
 
-        const [{default: Component}] = await Promise.all([run(vFile, runtime), initComponents()]);
-
-        let code: string | undefined = vFile.toString();
-
-        const state = {};
+        const state: MdxStateCtxValue = {};
         const setState = (value: MdxStateCtxValue) => {
             Object.assign(state, value);
         };
+
+        const [{default: Component}] = await Promise.all([
+            run(vFile, runtime),
+            initComponents(state),
+        ]);
+
+        let code: string | undefined = vFile.toString();
 
         const options = {
             identifierPrefix: id,

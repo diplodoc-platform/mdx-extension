@@ -1,6 +1,7 @@
 import React from 'react';
 import type {MDXComponents} from 'mdx/types';
 import {run} from '@mdx-js/mdx';
+import type {MdxStateCtxValue} from '../../context';
 
 export type ComponentBaseProps = {
     children?: React.ReactNode;
@@ -10,13 +11,16 @@ export const componentGetInitProps = new WeakMap<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     React.ComponentType<any>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (props?: any) => Promise<unknown>
+    (...args: any[]) => Promise<unknown> | unknown
 >();
 
 const getInitPropsFn = <C extends React.ComponentType, T = React.ComponentProps<C>>(
     component: React.ComponentType,
 ) => {
-    return componentGetInitProps.get(component) as (props: Object) => Promise<T>;
+    return componentGetInitProps.get(component) as (
+        props: Object,
+        mdxState: MdxStateCtxValue,
+    ) => Promise<T> | T;
 };
 
 const getPropsKey = (name: string, props: ComponentBaseProps) => {
@@ -33,7 +37,7 @@ export const getComponentInitProps = async (
     const componentNameList = Object.keys(components);
 
     const componentsOverrides: MDXComponents = {};
-    const keyInitFnList: (() => Promise<void>)[] = [];
+    const keyInitFnList: ((state: MdxStateCtxValue) => Promise<void>)[] = [];
     const keyInitFnResult: Record<string, {}> = {};
     const fakeJsx = (mdxComponent: MDXComponents['string'], props: ComponentBaseProps) => {
         const component = mdxComponent as React.ComponentType;
@@ -46,8 +50,8 @@ export const getComponentInitProps = async (
             if (fn) {
                 const uKey = getPropsKey(name, props);
 
-                keyInitFnList.push(() =>
-                    fn(props).then((p) => {
+                keyInitFnList.push((mdxState) =>
+                    Promise.resolve(fn(props, mdxState)).then((p) => {
                         keyInitFnResult[uKey] = p;
                     }),
                 );
@@ -68,8 +72,8 @@ export const getComponentInitProps = async (
     });
     trackComponent({components: components});
 
-    const initComponents = async () => {
-        await Promise.all(keyInitFnList.map((fn) => fn()));
+    const initComponents = async (mdxState: MdxStateCtxValue) => {
+        await Promise.all(keyInitFnList.map((fn) => fn(mdxState)));
     };
 
     let renderComponents = components;

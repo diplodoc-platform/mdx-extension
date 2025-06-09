@@ -5,7 +5,7 @@ import DefaultPlugins from '@diplodoc/transform/lib/plugins';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {MdxPluginEnv, mdxPlugin} from '@plugin';
 import type {OutputType} from '@diplodoc/transform/lib/typings';
-import {COMPONENTS, PURE_COMPONENTS} from '@/components';
+import {PURE_COMPONENTS, SSR_COMPONENTS} from '@/components';
 import getAsyncSsrRenderer from '../../../../src/utils/getAsyncSsrRenderer';
 import assert from 'node:assert';
 
@@ -15,7 +15,7 @@ export interface SsrRendererWorker {
 
 const getContent = async (content: string) => {
     const {render, renderAsync} = await getAsyncSsrRenderer({
-        components: COMPONENTS,
+        components: SSR_COMPONENTS,
         pureComponents: PURE_COMPONENTS,
     });
 

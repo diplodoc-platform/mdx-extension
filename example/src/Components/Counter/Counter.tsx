@@ -1,12 +1,15 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Button} from '@gravity-ui/uikit';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {MdxStateCtx} from '@plugin';
 
-type CounterProps = {
+export type CounterProps = {
     initialValue?: number;
 };
 
 export const Counter: React.FC<CounterProps> = ({initialValue = 0}) => {
-    const [count, setCount] = useState(initialValue);
+    const state = useContext(MdxStateCtx as React.ServerContext<{initialValue?: number} | null>);
+    const [count, setCount] = useState(state?.initialValue ?? initialValue);
 
     return (
         <div style={{display: 'flex', alignItems: 'center'}}>

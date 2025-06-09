@@ -21,9 +21,6 @@ const getInitPropsFn = <C extends React.ComponentType, T = React.ComponentProps<
 };
 
 const getPropsKey = (name: string, props: ComponentBaseProps) => {
-    if (props.key) {
-        return props.key;
-    }
     const {children: _, ...reset} = props;
     return JSON.stringify([name, reset]);
 };
@@ -46,9 +43,9 @@ export const getComponentInitProps = async (
             const name = componentNameList[idx];
             usedComponents.add(name);
 
-            const uKey = getPropsKey(name, props as ComponentBaseProps);
             const fn = getInitPropsFn(component);
             if (fn) {
+                const uKey = getPropsKey(name, props as ComponentBaseProps);
                 keyInitFnList.push(() =>
                     fn(props).then((p) => {
                         keyInitFnResult[uKey] = p;

@@ -7,29 +7,20 @@ export type ComponentBaseProps = {
     key?: string;
 };
 
-const componentGetInitProps = new WeakMap<
+export const componentGetInitProps = new WeakMap<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     React.ComponentType<any>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (props?: any) => Promise<unknown>
 >();
 
-export const withInitProps = <A = {}, T = React.ComponentType<A>>(
-    component: T,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getInitProps: (props: any) => Promise<A>,
-): T => {
-    componentGetInitProps.set(component as React.ComponentType<A>, getInitProps);
-    return component as T;
-};
-
-export const getInitPropsFn = <C extends React.ComponentType, T = React.ComponentProps<C>>(
+const getInitPropsFn = <C extends React.ComponentType, T = React.ComponentProps<C>>(
     component: React.ComponentType,
 ) => {
     return componentGetInitProps.get(component) as (props: Object) => Promise<T>;
 };
 
-export const getPropsKey = (name: string, props: ComponentBaseProps) => {
+const getPropsKey = (name: string, props: ComponentBaseProps) => {
     if (props.key) {
         return props.key;
     }

@@ -1,5 +1,3 @@
-import type {MdxStateCtxValue} from './context';
-
 export interface MdxArtifacts {
     idMdx: Record<string, string>;
 }
@@ -10,6 +8,10 @@ export interface MdxPluginEnv {
 
 export type MDXRenderer = (mdx: string, mdxArtifacts: MdxArtifacts) => string;
 
-export interface MDXGetInitialProps<P = Record<string, unknown>, R = P> {
-    (props: R, mdxSate: MdxStateCtxValue): Promise<P> | P;
+export interface MDXGetInitialProps<
+    ComponentProps = Record<string, unknown>,
+    MdxState = ComponentProps,
+    MdxProps = ComponentProps,
+> {
+    (props: MdxProps, mdxSate: MdxState): Promise<ComponentProps> | ComponentProps;
 }

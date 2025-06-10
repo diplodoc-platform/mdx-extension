@@ -48,17 +48,21 @@ export const getComponentInitProps = async (
 
             const fn = getInitPropsFn(component);
             if (fn) {
-                const uKey = getPropsKey(name, props);
-
+                const clearProps = removeReactNodeProps(props);
+                const uKey = getPropsKey(name, clearProps);
                 keyInitFnList.push((mdxState) =>
-                    Promise.resolve(fn(props, mdxState)).then((p) => {
+                    Promise.resolve(fn(clearProps, mdxState)).then((p) => {
                         keyInitFnResult[uKey] = p;
                     }),
                 );
 
                 componentsOverrides[name] = (propsLocal) => {
-                    const uKeyLocal = getPropsKey(name, propsLocal);
-                    return React.createElement(component, keyInitFnResult[uKeyLocal]);
+                    const clearPropsLocal = removeReactNodeProps(propsLocal);
+                    const uKeyLocal = getPropsKey(name, clearPropsLocal);
+                    return React.createElement(component, {
+                        ...propsLocal,
+                        ...keyInitFnResult[uKeyLocal],
+                    });
                 };
             }
         }
@@ -86,4 +90,32 @@ export const getComponentInitProps = async (
 
 export function generateUniqueId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
+}
+
+function hasReactNode(value: unknown): boolean {
+    if (React.isValidElement(value)) {
+        return true;
+    }
+
+    if (Array.isArray(value)) {
+        return value.some(hasReactNode);
+    }
+
+    if (typeof value === 'object' && value !== null) {
+        return Object.values(value).some(hasReactNode);
+    }
+
+    return false;
+}
+
+function removeReactNodeProps<T extends Record<string, unknown>>(props: T): Partial<T> {
+    const result: Partial<T> = {};
+
+    for (const key in props) {
+        if (!hasReactNode(props[key])) {
+            result[key] = props[key];
+        }
+    }
+
+    return result;
 }

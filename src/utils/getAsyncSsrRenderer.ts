@@ -9,7 +9,7 @@ import {escapeAttribute, isEmptyObject} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {generateUniqueId, getComponentInitProps} from './internal/asyncRenderTools';
 
-interface GetSsrRendererProps {
+interface GetAsyncSsrRendererProps {
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     compileOptions?: CompileOptions;
@@ -19,7 +19,7 @@ const getAsyncSsrRenderer = async ({
     components,
     pureComponents,
     compileOptions,
-}: GetSsrRendererProps) => {
+}: GetAsyncSsrRendererProps) => {
     const componentsNames = Object.keys(components || {});
 
     const allComponents = {

@@ -1,3 +1,5 @@
+export type {WithInitialProps} from './utils/withInitialProps';
+
 export interface MdxArtifacts {
     idMdx: Record<string, string>;
 }

@@ -152,6 +152,7 @@ React hook for client-side MDX processing.
 - `html`: HTML string from Diplodoc transform
 - `components`: Object of React components to use
 - `mdxArtifacts`: MDX artifacts from transform
+- `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
 
 ### `useMdxSsr(options: UseMdxSsrProps)`
 
@@ -163,14 +164,65 @@ React hook for SSR-processed MDX content.
 - `html`: HTML string from Diplodoc transform
 - `components`: Object of React components to use
 - `mdxArtifacts`: MDX artifacts from transform
+- `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
 
-### `getRenderer()`
+### `getRenderer(options: GetRenderProps)`
 
 Creates an renderer function for client-side processing.
 
-### `getSsrRenderer(options: { components: MDXComponents })`
+#### Options:
+
+- `compileOptions?`: MDX compilation options (see [MDX documentation](https://mdxjs.com/packages/mdx/#compileoptions))
+
+### `getSsrRenderer(options: GetSsrRendererProps)`
 
 Creates an SSR renderer function for server-side processing.
+
+#### Options:
+
+- `components`: Object of React components to use
+- `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
+- `compileOptions?`: MDX compilation options (see [MDX documentation](https://mdxjs.com/packages/mdx/#compileoptions))
+
+### `getAsyncSsrRenderer(options: GetAsyncSsrRendererProps)`
+
+Creates an asynchronous SSR renderer that supports `withInitialProps`.
+
+#### Options:
+
+- `components`: Object of React components to use
+- `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
+- `compileOptions?`: MDX compilation options (see [MDX documentation](https://mdxjs.com/packages/mdx/#compileoptions))
+
+### State Management Contexts
+
+#### `MdxStateCtx: Context<MdxStateCtxValue>`
+
+Provides access to the current MDX state:
+
+```tsx
+    const state = useContext(MdxStateCtx);
+```
+
+#### `MdxSetStateCtx: Context<MdxSetStateCtxValue>`
+
+Provides state setter function (only available during SSR):
+
+```tsx
+  const setState = useContext(MdxSetStateCtx);
+  // Usage in SSR:
+  setState?.({ key: value });
+```
+
+### Component Enhancers
+
+#### `withInitialProps: WithInitialProps`
+Wraps a component to enable initial props fetching during SSR.
+
+**Parameters:**
+- `component`: React component to wrap
+- `getInitProps`: Function that receives props and MDX state, returns props (sync or async)
+
 
 ## Syntax Examples
 
@@ -197,6 +249,84 @@ Creates an SSR renderer function for server-side processing.
   Click me
 </Button>
 ```
+
+## Advanced Features
+
+### State Management in SSR
+
+The library provides two context providers for managing state during Server-Side Rendering (SSR):
+
+- **`MdxSetStateCtx`** - A context that provides a function to update the MDX state. This function is only available during SSR (`null` on client-side). If you set a component's state using this context, it will be:
+  - Serialized into the `data-mdx-state` attribute during SSR
+  - Available in `MdxStateCtx` when the component renders
+
+- **`MdxStateCtx`** - A context that provides access to the current MDX state value
+
+### Asynchronous SSR with Initial Props
+
+- **`withInitialProps`** - A higher-order component that enables asynchronous data fetching for SSR:
+  - When wrapping a component with this function and using `getAsyncSsrRenderer`, the `getInitialProps` function will be called
+  - Receives the component's props and MDX state as arguments
+  - Can return either static or promise-based props
+
+- **`getAsyncSsrRenderer`** - An asynchronous version of `getSsrRenderer` that:
+  - Supports components wrapped with `withInitialProps`
+  - Enables async data fetching during SSR
+
+Example usage:
+```typescript
+const getInitialProps: MDXGetInitialProps<CounterProps> = (props, mdxState) => {
+    mdxState.initialValue = 10; // Set initial state
+    return props;
+};
+
+export const SSR_COMPONENTS = {
+    ...COMPONENTS,
+    Counter: withInitialProps(Counter, getInitialProps),
+};
+```
+
+### Pure Components
+
+The library supports pure components that:
+- Are only rendered once during SSR
+- Skip hydration on the client side
+- Can be specified via the `pureComponents` option in:
+  - `useMdx`
+  - `useMdxSsr`
+  - `getSsrRenderer`
+  - `getAsyncSsrRenderer`
+
+Example:
+```typescript
+export const PURE_COMPONENTS = {
+    KatexFormula,  // Will render once on server and not hydrate
+    Label,         // on client
+    CompatTable,
+    Alert,
+};
+```
+
+### Compilation Options
+
+All renderer functions (`getSsrRenderer`, `getAsyncSsrRenderer`, `getRenderer`) now accept optional MDX compilation options:
+
+```typescript
+interface CompileOptions {
+    // MDX compilation options
+    // See MDX documentation for full details
+}
+
+const renderer = await getAsyncSsrRenderer({
+    components: SSR_COMPONENTS,
+    pureComponents: PURE_COMPONENTS,
+    compileOptions: {
+        // MDX compilation options here
+    }
+});
+```
+
+This allows for fine-grained control over the MDX compilation process while maintaining the library's core functionality.
 
 ## License
 

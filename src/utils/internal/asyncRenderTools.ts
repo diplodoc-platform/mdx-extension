@@ -2,6 +2,8 @@ import React from 'react';
 import type {MDXComponents} from 'mdx/types';
 import {run} from '@mdx-js/mdx';
 import type {MdxStateCtxValue} from '../../context';
+import * as runtime from 'react/jsx-runtime';
+import {HOOK_ARG} from '../../constants';
 
 export type ComponentBaseProps = {
     children?: React.ReactNode;
@@ -23,11 +25,6 @@ const getInitPropsFn = <C extends React.ComponentType, T = React.ComponentProps<
     ) => Promise<T> | T;
 };
 
-const getPropsKey = (name: string, props: ComponentBaseProps) => {
-    const {children: _, ...reset} = props;
-    return JSON.stringify([name, reset]);
-};
-
 export const getComponentInitProps = async (
     components: MDXComponents,
     vFile: Parameters<typeof run>[0],
@@ -38,30 +35,30 @@ export const getComponentInitProps = async (
 
     const componentsOverrides: MDXComponents = {};
     const keyInitFnList: ((state: MdxStateCtxValue) => Promise<void>)[] = [];
-    const keyInitFnResult: Record<string, {}> = {};
+    let callIdx = 0;
+    const idxInitFnResult = new Map<number, {}>();
     const fakeJsx = (mdxComponent: MDXComponents['string'], props: ComponentBaseProps) => {
         const component = mdxComponent as React.ComponentType;
-        const idx = componentList.indexOf(component);
-        if (idx !== -1) {
-            const name = componentNameList[idx];
+        const listIdx = componentList.indexOf(component);
+        if (listIdx !== -1) {
+            const name = componentNameList[listIdx];
             usedComponents.add(name);
 
             const fn = getInitPropsFn(component);
             if (fn) {
+                const currentCallIdx = ++callIdx;
                 const clearProps = removeReactNodeProps(props);
-                const uKey = getPropsKey(name, clearProps);
                 keyInitFnList.push((mdxState) =>
                     Promise.resolve(fn(clearProps, mdxState)).then((p) => {
-                        keyInitFnResult[uKey] = p;
+                        idxInitFnResult.set(currentCallIdx, p);
                     }),
                 );
 
-                componentsOverrides[name] = (propsLocal) => {
-                    const clearPropsLocal = removeReactNodeProps(propsLocal);
-                    const uKeyLocal = getPropsKey(name, clearPropsLocal);
+                componentsOverrides[name] = (propsLocal: {[HOOK_ARG]: number}) => {
+                    const {[HOOK_ARG]: id, ...rest} = propsLocal;
                     return React.createElement(component, {
-                        ...propsLocal,
-                        ...keyInitFnResult[uKeyLocal],
+                        ...rest,
+                        ...idxInitFnResult.get(id),
                     });
                 };
             }
@@ -85,7 +82,12 @@ export const getComponentInitProps = async (
         renderComponents = {...components, ...componentsOverrides};
     }
 
-    return {initComponents, renderComponents, usedComponents};
+    return {
+        initComponents,
+        renderComponents,
+        usedComponents,
+        componentsWithHooks: componentsOverrides,
+    };
 };
 
 export function generateUniqueId(): string {
@@ -118,4 +120,24 @@ function removeReactNodeProps<T extends Record<string, unknown>>(props: T): Part
     }
 
     return result;
+}
+
+export function getRuntimeWithHook(nameComponent: MDXComponents) {
+    const components = Object.values(nameComponent);
+    const runtimeCopy = {...runtime};
+    let callIdx = 0;
+    ['jsx' as const, 'jsxs' as const].forEach((key) => {
+        const origFn = runtimeCopy[key];
+        if (typeof origFn !== 'function') return;
+        runtimeCopy[key] = function (...args) {
+            if (components.includes(args[0])) {
+                const props = args[1] as {[HOOK_ARG]: number};
+                if (props && typeof props === 'object') {
+                    props[HOOK_ARG] = ++callIdx;
+                }
+            }
+            return origFn.apply(runtimeCopy, args);
+        };
+    });
+    return runtimeCopy;
 }

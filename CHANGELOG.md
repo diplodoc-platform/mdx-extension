@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.1.0...v1.1.1) (2025-06-10)
+
+
+### Bug Fixes
+
+* **asyncRender:** fix async renderer ([#7](https://github.com/diplodoc-platform/mdx-extension/issues/7)) ([cdff993](https://github.com/diplodoc-platform/mdx-extension/commit/cdff993ff4947c2e450094faf85c4eee8eecbede))
+
 ## [1.1.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.0.1...v1.1.0) (2025-06-10)
 
 

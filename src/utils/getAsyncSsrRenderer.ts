@@ -1,13 +1,16 @@
 import type {MDXComponents} from 'mdx/types';
 import {type CompileOptions, compile, run} from '@mdx-js/mdx';
-import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import type {MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
 import {escapeAttribute, isEmptyObject} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
-import {generateUniqueId, getComponentInitProps} from './internal/asyncRenderTools';
+import {
+    generateUniqueId,
+    getComponentInitProps,
+    getRuntimeWithHook,
+} from './internal/asyncRenderTools';
 
 interface GetAsyncSsrRendererProps {
     components?: MDXComponents;
@@ -33,16 +36,15 @@ const getAsyncSsrRenderer = async ({
             outputFormat: 'function-body',
         });
 
-        const {initComponents, usedComponents, renderComponents} = await getComponentInitProps(
-            allComponents,
-            vFile,
-        );
+        const {initComponents, usedComponents, renderComponents, componentsWithHooks} =
+            await getComponentInitProps(allComponents, vFile);
 
         const state: MdxStateCtxValue = {};
         const setState = (value: MdxStateCtxValue) => {
             Object.assign(state, value);
         };
 
+        const runtime = getRuntimeWithHook(componentsWithHooks);
         const [{default: Component}] = await Promise.all([
             run(vFile, runtime),
             initComponents(state),

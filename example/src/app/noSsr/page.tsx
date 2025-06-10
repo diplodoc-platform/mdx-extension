@@ -1,7 +1,7 @@
 'use client';
 import React, {useMemo, useRef} from 'react';
 import {CONTENT} from '@/constants';
-import {COMPONENTS} from '@/components';
+import {COMPONENTS, PURE_COMPONENTS} from '@/components';
 
 import '@diplodoc/transform/dist/css/yfm.css';
 import transform from '@diplodoc/transform';
@@ -23,7 +23,13 @@ const NoSsrPage: React.FC = () => {
         return result;
     }, []);
 
-    useMdx({refCtr: refYfm, html, components: COMPONENTS, mdxArtifacts});
+    useMdx({
+        refCtr: refYfm,
+        html,
+        components: COMPONENTS,
+        pureComponents: PURE_COMPONENTS,
+        mdxArtifacts,
+    });
 
     return <div ref={refYfm} className={'yfm'} />;
 };

@@ -5,7 +5,7 @@ This is a Next.js project that demonstrates both SSR and client-side rendering o
 ## Features
 
 - **SSR (Server-Side Rendering)** – `/` route renders `@diplodoc/mdx-extension` on the server
-- **Client-Side Rendering** – `/pageNoSsr` route loads `@diplodoc/mdx-extension` in the browser
+- **Client-Side Rendering** – `/noSsr` route loads `@diplodoc/mdx-extension` in the browser
 - Next.js optimized production build
 
 ## Prerequisites
@@ -43,7 +43,7 @@ This is a Next.js project that demonstrates both SSR and client-side rendering o
 ## Available Routes
 
 - `/` – Server-side rendered version of `@diplodoc/mdx-extension`
-- `/pageNoSsr` – Client-side rendered version of `@diplodoc/mdx-extension`
+- `/noSsr` – Client-side rendered version of `@diplodoc/mdx-extension`
 
 ## Development Scripts
 

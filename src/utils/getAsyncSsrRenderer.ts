@@ -1,54 +1,59 @@
 import type {MDXComponents} from 'mdx/types';
-import {type CompileOptions, compileSync, runSync} from '@mdx-js/mdx';
+import {type CompileOptions, compile, run} from '@mdx-js/mdx';
 import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import type {MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {escapeAttribute, isEmptyObject, wrapObject} from './internal/common';
+import {escapeAttribute, isEmptyObject} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
+import {generateUniqueId, getComponentInitProps} from './internal/asyncRenderTools';
 
-interface GetSsrRendererProps {
+interface GetAsyncSsrRendererProps {
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     compileOptions?: CompileOptions;
 }
 
-const getSsrRenderer = async ({
+const getAsyncSsrRenderer = async ({
     components,
     pureComponents,
     compileOptions,
-}: GetSsrRendererProps) => {
+}: GetAsyncSsrRendererProps) => {
     const componentsNames = Object.keys(components || {});
-    const usedComponents = new Set<string>();
-    const combinedComponents = wrapObject(
-        {
-            ...components,
-            ...pureComponents,
-        },
-        (name) => usedComponents.add(name),
-    );
 
-    const render = (id: string, mdx: string) => {
-        const vFile = compileSync(mdx, {
+    const allComponents = {
+        ...components,
+        ...pureComponents,
+    };
+
+    const render = async (id: string, mdx: string) => {
+        const vFile = await compile(mdx, {
             ...compileOptions,
             outputFormat: 'function-body',
         });
 
-        const {default: Component} = runSync(vFile, runtime);
+        const {initComponents, usedComponents, renderComponents} = await getComponentInitProps(
+            allComponents,
+            vFile,
+        );
 
-        let code: string | undefined = vFile.toString();
-
-        const state = {};
+        const state: MdxStateCtxValue = {};
         const setState = (value: MdxStateCtxValue) => {
             Object.assign(state, value);
         };
+
+        const [{default: Component}] = await Promise.all([
+            run(vFile, runtime),
+            initComponents(state),
+        ]);
+
+        let code: string | undefined = vFile.toString();
 
         const options = {
             identifierPrefix: id,
         };
 
-        usedComponents.clear();
         let html = renderToString(
             React.createElement(TAG_NAME, {
                 className: id,
@@ -57,7 +62,7 @@ const getSsrRenderer = async ({
                     children: React.createElement(MdxStateCtx.Provider, {
                         value: state,
                         children: React.createElement(Component, {
-                            components: combinedComponents,
+                            components: renderComponents,
                         }),
                     }),
                 }),
@@ -81,19 +86,36 @@ const getSsrRenderer = async ({
         return {html, code};
     };
 
-    let idx = 0;
+    const idFragment = new Map<string, {replacer: string; mdx: string}>();
 
-    const getHtml = (mdx: string, mdxArtifacts: MdxArtifacts) => {
+    const getHtmlAsync = async (inputOrig: string, mdxArtifacts: MdxArtifacts) => {
+        let input = inputOrig;
         const {idMdx} = mdxArtifacts;
-        const id = `${MDX_PREFIX}${++idx}`;
-        const {html, code} = render(id, mdx);
-        if (code) {
-            idMdx[id] = code;
+
+        const items = Array.from(idFragment.entries());
+
+        for (let item, i = 0; (item = items[i]); i++) {
+            const [id, {replacer, mdx}] = item;
+            const {html, code} = await render(id, mdx);
+            input = input.replace(replacer, () => html);
+            if (code) {
+                idMdx[id] = code;
+            }
         }
-        return html;
+
+        return input;
     };
 
-    return getHtml;
+    let idx = 0;
+
+    const getHtml = (mdx: string) => {
+        const id = `${MDX_PREFIX}${++idx}`;
+        const replacer = `<${TAG_NAME} class="${id}">${generateUniqueId()}</${TAG_NAME}>`;
+        idFragment.set(id, {replacer, mdx});
+        return replacer;
+    };
+
+    return {render: getHtml, renderAsync: getHtmlAsync};
 };
 
-export default getSsrRenderer;
+export default getAsyncSsrRenderer;

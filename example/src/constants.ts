@@ -138,10 +138,10 @@ Renders:
   }}
 </CompatTable>
 
-### Диаграмма последовательности
+### Mermaid Diagram
 
 \`\`\`markdown
-<MermaidDiagram>
+<MermaidDiagram skeletonHeight={266}>
   {\`sequenceDiagram
     participant User
     participant API
@@ -152,13 +152,27 @@ Renders:
 
 Renders:  
 
-<MermaidDiagram>
+<MermaidDiagram skeletonHeight={266}>
   {\`sequenceDiagram
     participant User
     participant API
     User->>API: GET /data
     API-->>User: 200 OK\`}
 </MermaidDiagram>
+
+### Katex Formula
+
+\`\`\`markdown
+<KatexFormula>
+  {\`E = mc^2\`}
+</KatexFormula>
+\`\`\`
+
+Renders:  
+
+<KatexFormula>
+  {"E = mc^2"}
+</KatexFormula>
 
 ## Limitations
 

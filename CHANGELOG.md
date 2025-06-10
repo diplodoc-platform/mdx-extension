@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/diplodoc-platform/mdx-extension/compare/v1.1.1...v1.1.2) (2025-06-10)
+
+
+### Bug Fixes
+
+* **asyncRender:** use hooks via arg ([#9](https://github.com/diplodoc-platform/mdx-extension/issues/9)) ([5c0e7d2](https://github.com/diplodoc-platform/mdx-extension/commit/5c0e7d210d3c43fbdb54b5db6706010e576a619d))
+
 ## [1.1.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.1.0...v1.1.1) (2025-06-10)
 
 

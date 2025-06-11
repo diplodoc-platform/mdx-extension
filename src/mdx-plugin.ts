@@ -60,7 +60,8 @@ const mdxPlugin = (options?: Options) => {
                     closeTagFragment,
                     openTagEnd,
                     isSelfClosed = false,
-                    isMdx = false;
+                    isMdx = false,
+                    isFragment = false;
 
                 if (nextChar === '>') {
                     // Обработка <> тега
@@ -69,6 +70,7 @@ const mdxPlugin = (options?: Options) => {
                     closeTag = '</>';
                     closeTagFragment = closeTag;
                     openTagEnd = openBracketPos + 2;
+                    isFragment = true;
                 } else if (/[A-Z]/.test(nextChar)) {
                     // Обработка тегов с заглавной буквы (включая MDX)
                     const tagMatch = processedText
@@ -120,6 +122,7 @@ const mdxPlugin = (options?: Options) => {
                     openTagEnd,
                     openTagFragment,
                     closeTagFragment,
+                    isFragment,
                 );
                 if (closeTagStart === -1) {
                     pos = openBracketPos + 1;

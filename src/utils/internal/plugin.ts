@@ -4,6 +4,7 @@
  * @param pos - начальная позиция поиска
  * @param openTag - паттерн для поиска открывающего тега
  * @param closeTag - закрывающий тег
+ * @param isFragment - флаг, указывающий, что тег является фрагментом
  * @returns {number} - позиция закрывающего тега или -1, если не найден
  */
 export function findMatchingClosingTag(
@@ -11,16 +12,26 @@ export function findMatchingClosingTag(
     pos: number,
     openTag: string,
     closeTag: string,
+    isFragment: boolean,
 ) {
     let depth = 1;
     let currentPos = pos;
 
     while (depth > 0 && currentPos < text.length) {
         // Ищем следующий открывающий тег
-        const nextOpenPos = text.indexOf(openTag, currentPos);
+        let nextOpenPos = text.indexOf(openTag, currentPos);
 
         // Ищем следующий закрывающий тег
-        const nextClosePos = text.indexOf(closeTag, currentPos);
+        let nextClosePos = text.indexOf(closeTag, currentPos);
+
+        if (!isFragment) {
+            while (nextOpenPos !== -1 && /[a-zA-Z0-9]/.test(text[nextOpenPos + openTag.length])) {
+                nextOpenPos = text.indexOf(openTag, nextOpenPos + openTag.length);
+            }
+            while (nextClosePos !== -1 && !/[\s\t>]/.test(text[nextClosePos + closeTag.length])) {
+                nextClosePos = text.indexOf(closeTag, nextClosePos + closeTag.length);
+            }
+        }
 
         // Закрывающий тег не найден
         if (nextClosePos === -1) return -1;

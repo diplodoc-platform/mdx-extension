@@ -1,15 +1,15 @@
 import type {MDXComponents} from 'mdx/types';
-import {type CompileOptions, compile, run} from '@mdx-js/mdx';
+import {type CompileOptions, type RunOptions, compile, run} from '@mdx-js/mdx';
 import React from 'react';
 import type {MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {escapeAttribute, isEmptyObject} from './internal/common';
+import {escapeAttribute, isEmptyObject, wrapObject} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {
+    AsyncComponentWrapper,
     generateUniqueId,
-    getComponentInitProps,
-    getRuntimeWithHook,
+    getMdxRuntimeWithHook,
 } from './internal/asyncRenderTools';
 
 interface GetAsyncSsrRendererProps {
@@ -25,10 +25,14 @@ const getAsyncSsrRenderer = async ({
 }: GetAsyncSsrRendererProps) => {
     const componentsNames = Object.keys(components || {});
 
-    const allComponents = {
-        ...components,
-        ...pureComponents,
-    };
+    const usedComponents = new Set<string>();
+    const combinedComponents = wrapObject(
+        {
+            ...components,
+            ...pureComponents,
+        },
+        (name) => usedComponents.add(name),
+    );
 
     const render = async (id: string, mdx: string) => {
         const vFile = await compile(mdx, {
@@ -36,19 +40,19 @@ const getAsyncSsrRenderer = async ({
             outputFormat: 'function-body',
         });
 
-        const {initComponents, usedComponents, renderComponents, componentsWithHooks} =
-            await getComponentInitProps(allComponents, vFile);
-
         const state: MdxStateCtxValue = {};
         const setState = (value: MdxStateCtxValue) => {
             Object.assign(state, value);
         };
 
-        const runtime = getRuntimeWithHook(componentsWithHooks);
-        const [{default: Component}] = await Promise.all([
-            run(vFile, runtime),
-            initComponents(state),
-        ]);
+        const {runtime, init} = getMdxRuntimeWithHook();
+        const {default: componentFn} = await run(vFile, runtime as unknown as RunOptions);
+
+        usedComponents.clear();
+        const r = componentFn({
+            components: combinedComponents,
+        }) as unknown as AsyncComponentWrapper;
+        await init(state);
 
         let code: string | undefined = vFile.toString();
 
@@ -63,9 +67,7 @@ const getAsyncSsrRenderer = async ({
                     value: setState,
                     children: React.createElement(MdxStateCtx.Provider, {
                         value: state,
-                        children: React.createElement(Component, {
-                            components: renderComponents,
-                        }),
+                        children: r.render(),
                     }),
                 }),
             }),

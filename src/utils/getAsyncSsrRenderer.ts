@@ -49,10 +49,12 @@ const getAsyncSsrRenderer = async ({
         const {default: componentFn} = await run(vFile, runtime as unknown as RunOptions);
 
         usedComponents.clear();
-        const r = componentFn({
+        const asyncWrapper = componentFn({
             components: combinedComponents,
         }) as unknown as AsyncComponentWrapper;
         await init(state);
+
+        const Component = () => asyncWrapper.build();
 
         let code: string | undefined = vFile.toString();
 
@@ -67,7 +69,7 @@ const getAsyncSsrRenderer = async ({
                     value: setState,
                     children: React.createElement(MdxStateCtx.Provider, {
                         value: state,
-                        children: r.render(),
+                        children: React.createElement(Component),
                     }),
                 }),
             }),

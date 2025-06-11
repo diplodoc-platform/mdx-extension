@@ -25,13 +25,14 @@ type JSXFnParameters = Parameters<typeof runtime.jsx>;
 
 export class AsyncComponentWrapper {
     args;
-    jsxs = false;
-    constructor(args: JSXFnParameters) {
+    jsxs;
+    node: React.ReactNode | undefined;
+    constructor(jsxs: boolean, args: JSXFnParameters) {
+        this.jsxs = jsxs;
         this.args = args;
     }
-    render(): React.ReactNode {
+    build(): React.ReactNode {
         const jsxFn = this.jsxs ? runtime.jsxs : runtime.jsx;
-        replaceComponentRefs(this.args);
         return jsxFn.apply(runtime, this.args);
     }
 }
@@ -39,8 +40,7 @@ export class AsyncComponentWrapper {
 export function getMdxRuntimeWithHook() {
     const refs: AsyncComponentWrapper[] = [];
     const jsx = function (isJsxs: boolean, ...args: JSXFnParameters) {
-        const ref = new AsyncComponentWrapper(args);
-        ref.jsxs = isJsxs;
+        const ref = new AsyncComponentWrapper(isJsxs, args);
         refs.push(ref);
         return ref;
     };
@@ -53,6 +53,7 @@ export function getMdxRuntimeWithHook() {
         for (let i = 0, len = refs.length; i < len; i++) {
             const ref = refs[i];
             const {args} = ref;
+            replaceComponentRefs(args);
             const [component, props] = args;
             const initFn = getInitPropsFn(component as React.ComponentType);
             if (initFn) {
@@ -66,7 +67,7 @@ export function getMdxRuntimeWithHook() {
 
 function replaceComponentRefs(thing: unknown): unknown {
     if (thing instanceof AsyncComponentWrapper) {
-        return thing.render();
+        return thing.build();
     }
 
     if (Array.isArray(thing)) {

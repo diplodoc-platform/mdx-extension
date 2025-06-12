@@ -57,7 +57,6 @@ const mdxPlugin = (options?: Options) => {
                 let openTag,
                     openTagFragment,
                     closeTag,
-                    closeTagFragment,
                     openTagEnd,
                     isSelfClosed = false,
                     isMdx = false,
@@ -68,7 +67,6 @@ const mdxPlugin = (options?: Options) => {
                     openTag = '<>';
                     openTagFragment = openTag;
                     closeTag = '</>';
-                    closeTagFragment = closeTag;
                     openTagEnd = openBracketPos + 2;
                     isFragment = true;
                 } else if (/[A-Z]/.test(nextChar)) {
@@ -92,7 +90,6 @@ const mdxPlugin = (options?: Options) => {
                     openTag = tagMatch[0];
                     openTagFragment = `<${tagName}`;
                     closeTag = `</${tagName}>`;
-                    closeTagFragment = `</${tagName}`;
                     openTagEnd = openBracketPos + openTag.length;
                 } else {
                     // Это не интересующий нас тег, пропускаем
@@ -121,7 +118,7 @@ const mdxPlugin = (options?: Options) => {
                     processedText,
                     openTagEnd,
                     openTagFragment,
-                    closeTagFragment,
+                    closeTag,
                     isFragment,
                 );
                 if (closeTagStart === -1) {

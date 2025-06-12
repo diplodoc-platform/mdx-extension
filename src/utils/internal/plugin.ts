@@ -2,36 +2,35 @@
  * Функция для нахождения соответствующего закрывающего тега с учетом вложенности
  * @param text - исходный текст
  * @param pos - начальная позиция поиска
- * @param openTag - паттерн для поиска открывающего тега
+ * @param openTagPart - паттерн для поиска открывающего тега
  * @param closeTag - закрывающий тег
- * @param isFragment - флаг, указывающий, что тег является фрагментом
+ * @param isFragmentElement - флаг, указывающий, что тег является фрагментом
  * @returns {number} - позиция закрывающего тега или -1, если не найден
  */
 export function findMatchingClosingTag(
     text: string,
     pos: number,
-    openTag: string,
+    openTagPart: string,
     closeTag: string,
-    isFragment: boolean,
+    isFragmentElement: boolean,
 ) {
     let depth = 1;
     let currentPos = pos;
 
     while (depth > 0 && currentPos < text.length) {
         // Ищем следующий открывающий тег
-        let nextOpenPos = text.indexOf(openTag, currentPos);
-
-        // Ищем следующий закрывающий тег
-        let nextClosePos = text.indexOf(closeTag, currentPos);
-
-        if (!isFragment) {
-            while (nextOpenPos !== -1 && /[a-zA-Z0-9]/.test(text[nextOpenPos + openTag.length])) {
-                nextOpenPos = text.indexOf(openTag, nextOpenPos + openTag.length);
-            }
-            while (nextClosePos !== -1 && !/[\s\t>]/.test(text[nextClosePos + closeTag.length])) {
-                nextClosePos = text.indexOf(closeTag, nextClosePos + closeTag.length);
+        let nextOpenPos = text.indexOf(openTagPart, currentPos);
+        if (!isFragmentElement) {
+            while (
+                nextOpenPos !== -1 &&
+                /[a-zA-Z0-9]/.test(text[nextOpenPos + openTagPart.length])
+            ) {
+                nextOpenPos = text.indexOf(openTagPart, nextOpenPos + openTagPart.length);
             }
         }
+
+        // Ищем следующий закрывающий тег
+        const nextClosePos = text.indexOf(closeTag, currentPos);
 
         // Закрывающий тег не найден
         if (nextClosePos === -1) return -1;
@@ -41,7 +40,7 @@ export function findMatchingClosingTag(
             depth++;
             // Пропускаем весь открывающий тег
             const endOfTag = text.indexOf('>', nextOpenPos) + 1;
-            currentPos = endOfTag > 0 ? endOfTag : nextOpenPos + openTag.length;
+            currentPos = endOfTag > 0 ? endOfTag : nextOpenPos + openTagPart.length;
         } else {
             depth--;
             if (depth === 0) {

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.6](https://github.com/diplodoc-platform/mdx-extension/compare/v1.1.5...v1.1.6) (2025-06-12)
+
+
+### Bug Fixes
+
+* **plugin:** better close tag search ([#17](https://github.com/diplodoc-platform/mdx-extension/issues/17)) ([c2f5b53](https://github.com/diplodoc-platform/mdx-extension/commit/c2f5b53bda786b63ee7a492573a5371947f588f4))
+
 ## [1.1.5](https://github.com/diplodoc-platform/mdx-extension/compare/v1.1.4...v1.1.5) (2025-06-11)
 
 

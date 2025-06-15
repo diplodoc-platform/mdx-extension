@@ -5,14 +5,14 @@ import type {MdxArtifacts, MdxPluginEnv} from './types';
 import getRender from './utils/getRender';
 import type {RuleCore} from 'markdown-it/lib/parser_core';
 import type {Token} from 'markdown-it';
-import {findMatchingClosingTag} from './utils/internal/plugin';
+import {replaceBlocks} from './utils/internal/plugin';
+import type {MdxBody} from './utils/internal/types';
 
 interface Options {
     render?: (mdx: string, mdxArtifacts: MdxArtifacts) => string;
+    tagNameList?: string[];
     isTestMode?: boolean;
 }
-
-type MdxBody = {content: string; fragment: string};
 
 export type MarkdownItWithTestEnv = MarkdownIt & {
     env: {
@@ -25,128 +25,25 @@ export type MarkdownItWithTestEnv = MarkdownIt & {
 };
 
 const mdxPlugin = (options?: Options) => {
-    const {render = getRender(), isTestMode = false} = options ?? {};
+    const {render = getRender(), isTestMode = false, tagNameList} = options ?? {};
 
     const transform: MarkdownItPluginCb<MdxPluginEnv> = (md) => {
         const idMdxBody: Record<string, MdxBody> = {};
 
         const corePlugin: RuleCore = (state) => {
-            let processedText = state.src;
             let index = 0;
 
-            let pos = 0;
-            while (pos < processedText.length) {
-                // Находим следующую открывающую угловую скобку
-                const openBracketPos = processedText.indexOf('<', pos);
-                if (openBracketPos === -1) break;
-
-                // Проверяем, что не достигли конца текста
-                if (openBracketPos + 1 >= processedText.length) {
-                    pos = openBracketPos + 1;
-                    continue;
-                }
-
-                const nextChar = processedText[openBracketPos + 1];
-
-                // Пропускаем закрывающие теги
-                if (nextChar === '/') {
-                    pos = openBracketPos + 1;
-                    continue;
-                }
-
-                let openTag,
-                    openTagFragment,
-                    closeTag,
-                    openTagEnd,
-                    isSelfClosed = false,
-                    isMdx = false,
-                    isFragment = false;
-
-                if (nextChar === '>') {
-                    // Обработка <> тега
-                    openTag = '<>';
-                    openTagFragment = openTag;
-                    closeTag = '</>';
-                    openTagEnd = openBracketPos + 2;
-                    isFragment = true;
-                } else if (/[A-Z]/.test(nextChar)) {
-                    // Обработка тегов с заглавной буквы (включая MDX)
-                    const tagMatch = processedText
-                        .slice(openBracketPos)
-                        .match(/<([A-Z][a-zA-Z0-9]*)([^>]*)>/);
-                    if (!tagMatch) {
-                        pos = openBracketPos + 1;
-                        continue;
-                    }
-
-                    const tagName = tagMatch[1];
-                    const tagAttrs = tagMatch[2] || '';
-
-                    // Проверяем, является ли тег self-closed
-                    isSelfClosed = tagAttrs.trim().endsWith('/');
-
-                    isMdx = tagName === 'MDX';
-
-                    openTag = tagMatch[0];
-                    openTagFragment = `<${tagName}`;
-                    closeTag = `</${tagName}>`;
-                    openTagEnd = openBracketPos + openTag.length;
-                } else {
-                    // Это не интересующий нас тег, пропускаем
-                    pos = openBracketPos + 1;
-                    continue;
-                }
-
-                if (isSelfClosed) {
-                    // Сохраняем self-closed тег как содержимое
-                    const id = String(++index);
-                    idMdxBody[id] = {content: openTag, fragment: openTag};
-
-                    // Заменяем на placeholder
-                    const placeholder = `<MDX>${id}</MDX>`;
-                    processedText =
-                        processedText.slice(0, openBracketPos) +
-                        placeholder +
-                        processedText.slice(openTagEnd);
-
-                    pos = openBracketPos + placeholder.length;
-                    continue;
-                }
-
-                // Находим закрывающий тег
-                const closeTagStart = findMatchingClosingTag(
-                    processedText,
-                    openTagEnd,
-                    openTagFragment,
-                    closeTag,
-                    isFragment,
-                );
-                if (closeTagStart === -1) {
-                    pos = openBracketPos + 1;
-                    continue;
-                }
-
-                const closeTagEnd = closeTagStart + closeTag.length;
-
-                const fragment = processedText.slice(openBracketPos, closeTagEnd);
-                // Извлекаем содержимое
-                const content = isMdx ? processedText.slice(openTagEnd, closeTagStart) : fragment;
-                const id = String(++index);
-                idMdxBody[id] = {content, fragment};
-
-                // Заменяем весь тег на placeholder
-                const placeholder = `<MDX>${id}</MDX>`;
-                processedText =
-                    processedText.slice(0, openBracketPos) +
-                    placeholder +
-                    processedText.slice(closeTagEnd);
-
-                // Обновляем позицию для поиска
-                pos = openBracketPos + placeholder.length;
-            }
-
             // eslint-disable-next-line no-param-reassign
-            state.src = processedText;
+            state.src = replaceBlocks({
+                content: state.src,
+                tagNameList,
+                replacer: (body) => {
+                    const id = String(++index);
+                    idMdxBody[id] = body;
+                    return `<MDX>${id}</MDX>`;
+                },
+            });
+
             return true;
         };
 

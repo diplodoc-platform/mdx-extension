@@ -101,3 +101,40 @@ describe('corePlugin', () => {
         expect(state.src).toBe(src);
     });
 });
+
+describe('corePluginWithTagNameList', () => {
+    let corePlugin: RuleCore;
+    let idMdxBody: MarkdownItWithTestEnv['env']['idMdxBody'];
+
+    beforeEach(() => {
+        const mdx = mdxPlugin({isTestMode: true, tagNameList: ['MDX']}) as unknown as PluginSimple;
+        const markdown = md().use(mdx) as unknown as MarkdownItWithTestEnv;
+        idMdxBody = markdown.env.idMdxBody;
+        corePlugin = markdown.env.corePlugin;
+    });
+
+    it('should ignore fragment tag', () => {
+        const state = {
+            src: 'Text <>content</> more text',
+            tokens: [],
+        } as unknown as StateCore;
+
+        corePlugin(state);
+
+        expect(state.src).toBe('Text <>content</> more text');
+    });
+
+    it('should not ignore fragment tag', () => {
+        const state = {
+            src: 'Text <MDX><>content</></MDX> more text',
+            tokens: [],
+        } as unknown as StateCore;
+
+        corePlugin(state);
+
+        expect(state.src).toMatch(/<MDX>\d+<\/MDX>/);
+        const id = state.src.match(/<MDX>(\d+)<\/MDX>/)?.[1] || -1;
+        expect(idMdxBody[id].content).toBe('<>content</>');
+        expect(idMdxBody[id].fragment).toBe('<MDX><>content</></MDX>');
+    });
+});

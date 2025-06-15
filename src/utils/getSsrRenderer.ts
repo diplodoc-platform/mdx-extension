@@ -8,17 +8,13 @@ import {renderToString} from 'react-dom/server';
 import {escapeAttribute, isEmptyObject, wrapObject} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 
-interface GetSsrRendererProps {
+export interface GetSsrRendererProps {
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     compileOptions?: CompileOptions;
 }
 
-const getSsrRenderer = async ({
-    components,
-    pureComponents,
-    compileOptions,
-}: GetSsrRendererProps) => {
+const getSsrRenderer = ({components, pureComponents, compileOptions}: GetSsrRendererProps) => {
     const componentsNames = Object.keys(components || {});
     const usedComponents = new Set<string>();
     const combinedComponents = wrapObject(

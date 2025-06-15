@@ -12,13 +12,13 @@ import {
     getMdxRuntimeWithHook,
 } from './internal/asyncRenderTools';
 
-interface GetAsyncSsrRendererProps {
+export interface GetAsyncSsrRendererProps {
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     compileOptions?: CompileOptions;
 }
 
-const getAsyncSsrRenderer = async ({
+const getAsyncSsrRenderer = ({
     components,
     pureComponents,
     compileOptions,

@@ -5,11 +5,11 @@ import type {MdxArtifacts} from './types';
 import type {GetAsyncSsrRendererProps} from './utils/getAsyncSsrRenderer';
 
 interface Options extends Omit<GetSsrRendererProps, 'components'> {
-    tagNameList?: string[];
+    tagNames?: string[];
 }
 
 export const getMdxCollectPlugin = (options: Options) => {
-    const {tagNameList, ...rendererOptions} = options;
+    const {tagNames, ...rendererOptions} = options;
 
     const render = getSsrRenderer(rendererOptions);
 
@@ -18,7 +18,7 @@ export const getMdxCollectPlugin = (options: Options) => {
 
         const content = replaceBlocks({
             content: origContent,
-            tagNameList,
+            tagNames,
             replacer: ({content: contentLocal}) => render(contentLocal, mdxArtifacts),
         });
 
@@ -29,11 +29,11 @@ export const getMdxCollectPlugin = (options: Options) => {
 };
 
 interface AsyncOptions extends Omit<GetAsyncSsrRendererProps, 'components'> {
-    tagNameList?: string[];
+    tagNames?: string[];
 }
 
 export const getAsyncMdxCollectPlugin = (options: AsyncOptions) => {
-    const {tagNameList, ...rendererOptions} = options;
+    const {tagNames, ...rendererOptions} = options;
 
     const {render, renderAsync} = getAsyncSsrRenderer(rendererOptions);
 
@@ -42,7 +42,7 @@ export const getAsyncMdxCollectPlugin = (options: AsyncOptions) => {
 
         let content = replaceBlocks({
             content: origContent,
-            tagNameList,
+            tagNames,
             replacer: ({content: contentLocal}) => render(contentLocal),
         });
 

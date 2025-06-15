@@ -107,7 +107,7 @@ describe('corePluginWithTagNameList', () => {
     let idMdxBody: MarkdownItWithTestEnv['env']['idMdxBody'];
 
     beforeEach(() => {
-        const mdx = mdxPlugin({isTestMode: true, tagNameList: ['MDX']}) as unknown as PluginSimple;
+        const mdx = mdxPlugin({isTestMode: true, tagNames: ['MDX']}) as unknown as PluginSimple;
         const markdown = md().use(mdx) as unknown as MarkdownItWithTestEnv;
         idMdxBody = markdown.env.idMdxBody;
         corePlugin = markdown.env.corePlugin;

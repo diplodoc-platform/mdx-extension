@@ -10,7 +10,7 @@ import type {MdxBody} from './utils/internal/types';
 
 interface Options {
     render?: (mdx: string, mdxArtifacts: MdxArtifacts) => string;
-    tagNameList?: string[];
+    tagNames?: string[];
     isTestMode?: boolean;
 }
 
@@ -25,7 +25,7 @@ export type MarkdownItWithTestEnv = MarkdownIt & {
 };
 
 const mdxPlugin = (options?: Options) => {
-    const {render = getRender(), isTestMode = false, tagNameList} = options ?? {};
+    const {render = getRender(), isTestMode = false, tagNames} = options ?? {};
 
     const transform: MarkdownItPluginCb<MdxPluginEnv> = (md) => {
         const idMdxBody: Record<string, MdxBody> = {};
@@ -36,7 +36,7 @@ const mdxPlugin = (options?: Options) => {
             // eslint-disable-next-line no-param-reassign
             state.src = replaceBlocks({
                 content: state.src,
-                tagNameList,
+                tagNames,
                 replacer: (body) => {
                     const id = String(++index);
                     idMdxBody[id] = body;

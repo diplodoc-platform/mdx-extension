@@ -48,12 +48,12 @@ function findMatchingClosingTag(
 
 interface ReplaceBlocksOptions {
     content: string;
-    tagNameList?: string[];
+    tagNames?: string[];
     replacer: (body: MdxBody) => string;
 }
 
 export function replaceBlocks(options: ReplaceBlocksOptions) {
-    const {tagNameList, replacer} = options;
+    const {tagNames, replacer} = options;
     let processedText = options.content;
 
     let pos = 0;
@@ -121,7 +121,7 @@ export function replaceBlocks(options: ReplaceBlocksOptions) {
             continue;
         }
 
-        if (tagNameList && !tagNameList.includes(tagName)) {
+        if (tagNames && !tagNames.includes(tagName)) {
             pos = openBracketPos + 1;
             continue;
         }

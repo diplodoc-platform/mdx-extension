@@ -14,7 +14,7 @@ export interface SsrRendererWorker {
 }
 
 const getContent = async (content: string) => {
-    const {render, renderAsync} = await getAsyncSsrRenderer({
+    const {render, renderAsync} = getAsyncSsrRenderer({
         components: SSR_COMPONENTS,
         pureComponents: PURE_COMPONENTS,
     });

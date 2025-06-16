@@ -1,8 +1,11 @@
 import type {RuleCore} from 'markdown-it/lib/parser_core.js';
 import md, {type PluginSimple} from 'markdown-it';
 import mdxPlugin, {type MarkdownItWithTestEnv} from '../src/mdx-plugin';
+import {InternalTagName} from '../src/constants';
 
 type StateCore = Parameters<RuleCore>[0];
+
+const placeholderRe = new RegExp(`<${InternalTagName}>(\\d+)</${InternalTagName}`);
 
 describe('corePlugin', () => {
     let corePlugin: RuleCore;
@@ -23,8 +26,8 @@ describe('corePlugin', () => {
 
         corePlugin(state);
 
-        expect(state.src).toMatch(/<MDX>\d+<\/MDX>/);
-        const id = state.src.match(/<MDX>(\d+)<\/MDX>/)?.[1] || -1;
+        expect(state.src).toMatch(placeholderRe);
+        const id = state.src.match(placeholderRe)?.[1] || -1;
         expect(idMdxBody[id].content).toBe('<Component>content</Component>');
         expect(idMdxBody[id].fragment).toBe('<MDX><Component>content</Component></MDX>');
     });
@@ -37,8 +40,8 @@ describe('corePlugin', () => {
 
         corePlugin(state);
 
-        expect(state.src).toMatch(/<MDX>\d+<\/MDX>/);
-        const id = state.src.match(/<MDX>(\d+)<\/MDX>/)?.[1] || -1;
+        expect(state.src).toMatch(placeholderRe);
+        const id = state.src.match(placeholderRe)?.[1] || -1;
         expect(idMdxBody[id].content).toBe('<Component>content</Component>');
         expect(idMdxBody[id].fragment).toBe('<Component>content</Component>');
     });
@@ -51,8 +54,8 @@ describe('corePlugin', () => {
 
         corePlugin(state);
 
-        expect(state.src).toMatch(/<MDX>\d+<\/MDX>/);
-        const id = state.src.match(/<MDX>(\d+)<\/MDX>/)?.[1] || -1;
+        expect(state.src).toMatch(placeholderRe);
+        const id = state.src.match(placeholderRe)?.[1] || -1;
         expect(idMdxBody[id].content).toBe(
             '<Component><ComponentItem>content</ComponentItem></Component>',
         );
@@ -69,8 +72,8 @@ describe('corePlugin', () => {
 
         corePlugin(state);
 
-        expect(state.src).toMatch(/<MDX>\d+<\/MDX>/);
-        const id = state.src.match(/<MDX>(\d+)<\/MDX>/)?.[1] || -1;
+        expect(state.src).toMatch(placeholderRe);
+        const id = state.src.match(placeholderRe)?.[1] || -1;
         expect(idMdxBody[id].content).toBe('<SelfClosing />');
         expect(idMdxBody[id].fragment).toBe('<SelfClosing />');
     });
@@ -83,8 +86,8 @@ describe('corePlugin', () => {
 
         corePlugin(state);
 
-        expect(state.src).toMatch(/<MDX>\d+<\/MDX>/);
-        const id = state.src.match(/<MDX>(\d+)<\/MDX>/)?.[1] || -1;
+        expect(state.src).toMatch(placeholderRe);
+        const id = state.src.match(placeholderRe)?.[1] || -1;
         expect(idMdxBody[id].content).toBe('<>content</>');
         expect(idMdxBody[id].fragment).toBe('<>content</>');
     });
@@ -99,5 +102,42 @@ describe('corePlugin', () => {
         corePlugin(state);
 
         expect(state.src).toBe(src);
+    });
+});
+
+describe('corePluginWithTagNameList', () => {
+    let corePlugin: RuleCore;
+    let idMdxBody: MarkdownItWithTestEnv['env']['idMdxBody'];
+
+    beforeEach(() => {
+        const mdx = mdxPlugin({isTestMode: true, tagNames: ['MDX']}) as unknown as PluginSimple;
+        const markdown = md().use(mdx) as unknown as MarkdownItWithTestEnv;
+        idMdxBody = markdown.env.idMdxBody;
+        corePlugin = markdown.env.corePlugin;
+    });
+
+    it('should ignore fragment tag', () => {
+        const state = {
+            src: 'Text <>content</> more text',
+            tokens: [],
+        } as unknown as StateCore;
+
+        corePlugin(state);
+
+        expect(state.src).toBe('Text <>content</> more text');
+    });
+
+    it('should not ignore fragment tag', () => {
+        const state = {
+            src: 'Text <MDX><>content</></MDX> more text',
+            tokens: [],
+        } as unknown as StateCore;
+
+        corePlugin(state);
+
+        expect(state.src).toMatch(placeholderRe);
+        const id = state.src.match(placeholderRe)?.[1] || -1;
+        expect(idMdxBody[id].content).toBe('<>content</>');
+        expect(idMdxBody[id].fragment).toBe('<MDX><>content</></MDX>');
     });
 });

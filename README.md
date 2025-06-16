@@ -132,6 +132,42 @@ function ServerPage({ html, mdxArtifacts }) {
 }
 ```
 
+## Collect Plugin
+
+The collect plugin provides functionality to process and transform MDX content while collecting artifacts. It comes in both synchronous and asynchronous versions.
+
+### Synchronous Collect Plugin
+
+```typescript
+import { getMdxCollectPlugin } from "@diplodoc/mdx-extension";
+
+const plugin = getMdxCollectPlugin({
+  tagNames: ['CustomComponent'], // Optional filter for specific tags
+  pureComponents: PURE_COMPONENTS,
+  compileOptions: {
+    // MDX compilation options
+  }
+});
+
+const transformedContent = plugin(originalContent);
+```
+
+### Asynchronous Collect Plugin
+
+```typescript
+import { getAsyncMdxCollectPlugin } from "@diplodoc/mdx-extension";
+
+const asyncPlugin = getAsyncMdxCollectPlugin({
+  tagNames: ['AsyncComponent'], // Optional filter for specific tags
+  pureComponents: PURE_COMPONENTS,
+  compileOptions: {
+    // MDX compilation options
+  }
+});
+
+const transformedContent = await asyncPlugin(originalContent);
+```
+
 ## API Reference
 
 ### `mdxPlugin(options?: { render?: MDXRenderer })`
@@ -141,6 +177,7 @@ The main plugin function that enables MDX processing.
 #### Options:
 
 - `render`: Optional renderer function, for SSR use `getSsrRenderer`
+- `tagNames?: string[]` - Optional array of tag names to filter which components will be processed
 
 ### `useMdx(options: UseMdxProps)`
 
@@ -193,6 +230,26 @@ Creates an asynchronous SSR renderer that supports `withInitialProps`.
 - `components`: Object of React components to use
 - `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
 - `compileOptions?`: MDX compilation options (see [MDX documentation](https://mdxjs.com/packages/mdx/#compileoptions))
+
+### `getMdxCollectPlugin(options: Options)`
+
+Creates a synchronous collect plugin for processing MDX content.
+
+#### Options:
+
+- `tagNames?: string[]` - Optional array of tag names to filter processing
+- `pureComponents?`: Components that should skip client-side hydration
+- `compileOptions?`: MDX compilation options
+
+### `getAsyncMdxCollectPlugin(options: AsyncOptions)`
+
+Creates an asynchronous collect plugin that supports components with initial props.
+
+#### Options:
+
+- `tagNames?: string[]` - Optional array of tag names to filter processing
+- `pureComponents?`: Components that should skip client-side hydration
+- `compileOptions?`: MDX compilation options
 
 ### State Management Contexts
 

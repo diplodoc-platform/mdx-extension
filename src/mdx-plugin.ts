@@ -7,6 +7,7 @@ import type {RuleCore} from 'markdown-it/lib/parser_core';
 import type {Token} from 'markdown-it';
 import {replaceBlocks} from './utils/internal/plugin';
 import type {MdxBody} from './utils/internal/types';
+import {InternalTagName} from './constants';
 
 interface Options {
     render?: (mdx: string, mdxArtifacts: MdxArtifacts) => string;
@@ -29,6 +30,7 @@ const mdxPlugin = (options?: Options) => {
 
     const transform: MarkdownItPluginCb<MdxPluginEnv> = (md) => {
         const idMdxBody: Record<string, MdxBody> = {};
+        const iTagLen = InternalTagName.length + 2;
 
         const corePlugin: RuleCore = (state) => {
             let index = 0;
@@ -40,7 +42,7 @@ const mdxPlugin = (options?: Options) => {
                 replacer: (body) => {
                     const id = String(++index);
                     idMdxBody[id] = body;
-                    return `<MDX>${id}</MDX>`;
+                    return `<${InternalTagName}>${id}</${InternalTagName}>`;
                 },
             });
 
@@ -49,7 +51,7 @@ const mdxPlugin = (options?: Options) => {
 
         md.core.ruler.before('block', 'mdx-replacer-core', corePlugin);
 
-        const mdxRe = /<MDX>(\d+)<\/MDX>/g;
+        const mdxRe = new RegExp(`<${InternalTagName}>(\\d+)</${InternalTagName}>`, 'g');
         const tokenTypes = ['code_block', 'code_inline', 'fence'];
         const coreReplaceBack: RuleCore = (state) => {
             const next = (tokens: Token[]) => {
@@ -81,7 +83,7 @@ const mdxPlugin = (options?: Options) => {
 
             const start = state.bMarks[startLine] + state.tShift[startLine];
 
-            if (state.src.slice(start, start + 5) !== '<MDX>') {
+            if (state.src.slice(start, start + iTagLen) !== `<${InternalTagName}>`) {
                 return false;
             }
 
@@ -89,7 +91,7 @@ const mdxPlugin = (options?: Options) => {
             let line = startLine;
 
             for (; line <= endLine; line++) {
-                endPos = state.src.indexOf('</MDX>', state.bMarks[line]);
+                endPos = state.src.indexOf(`</${InternalTagName}>`, state.bMarks[line]);
                 if (endPos !== -1 && endPos <= state.eMarks[line]) {
                     break;
                 }
@@ -99,11 +101,11 @@ const mdxPlugin = (options?: Options) => {
 
             if (!silent) {
                 const htmlToken = state.push('html_block', '', 0);
-                const id = state.src.slice(start + 5, endPos);
+                const id = state.src.slice(start + iTagLen, endPos);
                 htmlToken.content = render(idMdxBody[id].content, mdxArtifacts);
                 htmlToken.map = [startLine, line];
 
-                const afterText = state.src.slice(endPos + 6, state.eMarks[line]);
+                const afterText = state.src.slice(endPos + (iTagLen + 1), state.eMarks[line]);
                 if (afterText) {
                     const afterToken = state.push('inline', '', 0);
                     afterToken.content = afterText;
@@ -130,22 +132,22 @@ const mdxPlugin = (options?: Options) => {
             const start = state.pos;
 
             // Проверяем открывающий тег <MDX>
-            if (state.src.slice(start, start + 5) !== '<MDX>') {
+            if (state.src.slice(start, start + iTagLen) !== `<${InternalTagName}>`) {
                 return false;
             }
 
             // Находим закрывающий тег
-            const endPos = state.src.indexOf('</MDX>', start + 5);
+            const endPos = state.src.indexOf(`</${InternalTagName}>`, start + iTagLen);
             if (endPos === -1) return false;
 
             if (!silent) {
                 const token = state.push('html_inline', '', 0);
-                const id = state.src.slice(start + 5, endPos);
+                const id = state.src.slice(start + iTagLen, endPos);
                 token.content = render(idMdxBody[id].content, mdxArtifacts);
             }
 
             // eslint-disable-next-line no-param-reassign
-            state.pos = endPos + 6;
+            state.pos = endPos + (iTagLen + 1);
             return true;
         };
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.1.6...v1.2.0) (2025-06-16)
+
+
+### Features
+
+* **collect:** add collect plugin, tagNames filter ([#19](https://github.com/diplodoc-platform/mdx-extension/issues/19)) ([77b7e79](https://github.com/diplodoc-platform/mdx-extension/commit/77b7e79c1dce5e7a3b04c73580654ce935ab2106))
+
 ## [1.1.6](https://github.com/diplodoc-platform/mdx-extension/compare/v1.1.5...v1.1.6) (2025-06-12)
 
 

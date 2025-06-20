@@ -5,7 +5,7 @@ import {InternalTagName} from '../src/constants';
 
 type StateCore = Parameters<RuleCore>[0];
 
-const placeholderRe = new RegExp(`<${InternalTagName}>(\\d+)</${InternalTagName}`);
+const placeholderRe = new RegExp(`<${InternalTagName}>(\\d+)</${InternalTagName}>`);
 
 describe('corePlugin', () => {
     let corePlugin: RuleCore;

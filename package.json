@@ -33,6 +33,7 @@
   ],
   "devDependencies": {
     "@commitlint/config-conventional": "^19.8.1",
+    "@diplodoc/components": "^4.28.5",
     "@diplodoc/transform": "^4.57.3",
     "@gravity-ui/browserslist-config": "^4.3.0",
     "@gravity-ui/eslint-config": "^3.2.0",

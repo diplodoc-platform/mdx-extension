@@ -1,2 +1,2 @@
-export {default as useMdx} from './useMdx';
-export {default as useMdxSsr} from './useMdxSsr';
+export {default as useMdx, type UseMdxProps} from './useMdx';
+export {default as useMdxSsr, type UseMdxSsrProps} from './useMdxSsr';

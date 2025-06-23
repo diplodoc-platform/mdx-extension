@@ -29,9 +29,9 @@ yarn add @diplodoc/mdx-extension
 First, add the `mdxPlugin()` to your Diplodoc transform plugins:
 
 ```typescript
-import transform from "@diplodoc/transform";
-import DefaultPlugins from "@diplodoc/transform/lib/plugins";
-import { mdxPlugin } from "@diplodoc/mdx-extension";
+import transform from '@diplodoc/transform';
+import DefaultPlugins from '@diplodoc/transform/lib/plugins';
+import {mdxPlugin} from '@diplodoc/mdx-extension';
 
 const result = transform(markdownContent, {
   plugins: [...DefaultPlugins, mdxPlugin()],
@@ -41,10 +41,10 @@ const result = transform(markdownContent, {
 ### Client-side Rendering (CSR)
 
 ```tsx
-import React, { useMemo, useRef } from "react";
-import transform from "@diplodoc/transform";
-import DefaultPlugins from "@diplodoc/transform/lib/plugins";
-import { mdxPlugin, useMdx } from "@diplodoc/mdx-extension";
+import React, {useMemo, useRef} from 'react';
+import transform from '@diplodoc/transform';
+import DefaultPlugins from '@diplodoc/transform/lib/plugins';
+import {mdxPlugin, useMdx, isWithMdxArtifacts} from '@diplodoc/mdx-extension';
 
 const Components = {
   CustomComponent: (props) => <div {...props}>Custom</div>,
@@ -63,10 +63,12 @@ const CONTENT = `
 function App() {
   const ref = useRef(null);
 
-  const { html, mdxArtifacts } = useMemo(() => {
-    const { result } = transform(CONTENT, {
+  const {html, mdxArtifacts} = useMemo(() => {
+    const {result} = transform(CONTENT, {
       plugins: [...DefaultPlugins, mdxPlugin()],
     });
+
+    isWithMdxArtifacts(result);
 
     return result;
   }, []);
@@ -85,10 +87,10 @@ function App() {
 ### Server-side Rendering (SSR)
 
 ```tsx
-import React from "react";
-import transform from "@diplodoc/transform";
-import DefaultPlugins from "@diplodoc/transform/lib/plugins";
-import { mdxPlugin, useMdxSsr, getSsrRenderer } from "@diplodoc/mdx-extension";
+import React from 'react';
+import transform from '@diplodoc/transform';
+import DefaultPlugins from '@diplodoc/transform/lib/plugins';
+import {mdxPlugin, useMdxSsr, getSsrRenderer} from '@diplodoc/mdx-extension';
 
 const Components = {
   ServerComponent: (props) => <strong {...props}>Server Rendered</strong>,
@@ -105,16 +107,18 @@ export async function getServerSideProps() {
     components: Components,
   });
 
-  const {
-    result: { html, mdxArtifacts },
-  } = transform(CONTENT, {
-    plugins: [...DefaultPlugins, mdxPlugin({ render })],
+  const {result} = transform(CONTENT, {
+    plugins: [...DefaultPlugins, mdxPlugin({render})],
   });
 
-  return { props: { html, mdxArtifacts } };
+  isWithMdxArtifacts(result);
+
+  const {html, mdxArtifacts} = result;
+
+  return {props: {html, mdxArtifacts}};
 }
 
-function ServerPage({ html, mdxArtifacts }) {
+function ServerPage({html, mdxArtifacts}) {
   const ref = useRef(null);
 
   useMdxSsr({
@@ -125,7 +129,7 @@ function ServerPage({ html, mdxArtifacts }) {
   });
 
   const innerHtml = useMemo(() => {
-    return { __html: html };
+    return {__html: html};
   }, [html]);
 
   return <div ref={ref} dangerouslySetInnerHTML={innerHtml}></div>;
@@ -139,14 +143,14 @@ The collect plugin provides functionality to process and transform MDX content w
 ### Synchronous Collect Plugin
 
 ```typescript
-import { getMdxCollectPlugin } from "@diplodoc/mdx-extension";
+import {getMdxCollectPlugin} from '@diplodoc/mdx-extension';
 
 const plugin = getMdxCollectPlugin({
   tagNames: ['CustomComponent'], // Optional filter for specific tags
   pureComponents: PURE_COMPONENTS,
   compileOptions: {
     // MDX compilation options
-  }
+  },
 });
 
 const transformedContent = plugin(originalContent);
@@ -155,14 +159,14 @@ const transformedContent = plugin(originalContent);
 ### Asynchronous Collect Plugin
 
 ```typescript
-import { getAsyncMdxCollectPlugin } from "@diplodoc/mdx-extension";
+import {getAsyncMdxCollectPlugin} from '@diplodoc/mdx-extension';
 
 const asyncPlugin = getAsyncMdxCollectPlugin({
   tagNames: ['AsyncComponent'], // Optional filter for specific tags
   pureComponents: PURE_COMPONENTS,
   compileOptions: {
     // MDX compilation options
-  }
+  },
 });
 
 const transformedContent = await asyncPlugin(originalContent);
@@ -258,7 +262,7 @@ Creates an asynchronous collect plugin that supports components with initial pro
 Provides access to the current MDX state:
 
 ```tsx
-    const state = useContext(MdxStateCtx);
+const state = useContext(MdxStateCtx);
 ```
 
 #### `MdxSetStateCtx: Context<MdxSetStateCtxValue>`
@@ -266,20 +270,21 @@ Provides access to the current MDX state:
 Provides state setter function (only available during SSR):
 
 ```tsx
-  const setState = useContext(MdxSetStateCtx);
-  // Usage in SSR:
-  setState?.({ key: value });
+const setState = useContext(MdxSetStateCtx);
+// Usage in SSR:
+setState?.({key: value});
 ```
 
 ### Component Enhancers
 
 #### `withInitialProps: WithInitialProps`
+
 Wraps a component to enable initial props fetching during SSR.
 
 **Parameters:**
+
 - `component`: React component to wrap
 - `getInitProps`: Function that receives props and MDX state, returns props (sync or async)
-
 
 ## Syntax Examples
 
@@ -295,6 +300,7 @@ Wraps a component to enable initial props fetching during SSR.
 
 ```markdown
 <>
+
   <div>Fragment content</div>
 </>
 ```
@@ -303,7 +309,7 @@ Wraps a component to enable initial props fetching during SSR.
 
 ```markdown
 <Button onClick={() => console.log('click')}>
-  Click me
+Click me
 </Button>
 ```
 
@@ -314,6 +320,7 @@ Wraps a component to enable initial props fetching during SSR.
 The library provides two context providers for managing state during Server-Side Rendering (SSR):
 
 - **`MdxSetStateCtx`** - A context that provides a function to update the MDX state. This function is only available during SSR (`null` on client-side). If you set a component's state using this context, it will be:
+
   - Serialized into the `data-mdx-state` attribute during SSR
   - Available in `MdxStateCtx` when the component renders
 
@@ -322,6 +329,7 @@ The library provides two context providers for managing state during Server-Side
 ### Asynchronous SSR with Initial Props
 
 - **`withInitialProps`** - A higher-order component that enables asynchronous data fetching for SSR:
+
   - When wrapping a component with this function and using `getAsyncSsrRenderer`, the `getInitialProps` function will be called
   - Receives the component's props and MDX state as arguments
   - Can return either static or promise-based props
@@ -331,21 +339,23 @@ The library provides two context providers for managing state during Server-Side
   - Enables async data fetching during SSR
 
 Example usage:
+
 ```typescript
 const getInitialProps: MDXGetInitialProps<CounterProps> = (props, mdxState) => {
-    mdxState.initialValue = 10; // Set initial state
-    return props;
+  mdxState.initialValue = 10; // Set initial state
+  return props;
 };
 
 export const SSR_COMPONENTS = {
-    ...COMPONENTS,
-    Counter: withInitialProps(Counter, getInitialProps),
+  ...COMPONENTS,
+  Counter: withInitialProps(Counter, getInitialProps),
 };
 ```
 
 ### Pure Components
 
 The library supports pure components that:
+
 - Are only rendered once during SSR
 - Skip hydration on the client side
 - Can be specified via the `pureComponents` option in:
@@ -355,12 +365,13 @@ The library supports pure components that:
   - `getAsyncSsrRenderer`
 
 Example:
+
 ```typescript
 export const PURE_COMPONENTS = {
-    KatexFormula,  // Will render once on server and not hydrate
-    Label,         // on client
-    CompatTable,
-    Alert,
+  KatexFormula, // Will render once on server and not hydrate
+  Label, // on client
+  CompatTable,
+  Alert,
 };
 ```
 
@@ -369,17 +380,12 @@ export const PURE_COMPONENTS = {
 All renderer functions (`getSsrRenderer`, `getAsyncSsrRenderer`, `getRenderer`) now accept optional MDX compilation options:
 
 ```typescript
-interface CompileOptions {
-    // MDX compilation options
-    // See MDX documentation for full details
-}
-
 const renderer = await getAsyncSsrRenderer({
-    components: SSR_COMPONENTS,
-    pureComponents: PURE_COMPONENTS,
-    compileOptions: {
-        // MDX compilation options here
-    }
+  components: SSR_COMPONENTS,
+  pureComponents: PURE_COMPONENTS,
+  compileOptions: {
+    // MDX compilation options here
+  },
 });
 ```
 

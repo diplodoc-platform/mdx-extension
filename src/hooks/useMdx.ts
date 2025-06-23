@@ -3,7 +3,7 @@ import type {MdxArtifacts} from '../types';
 import {idMdxToComponents, renderMdxComponents} from '../utils/internal/common';
 import type {MDXComponents} from 'mdx/types';
 
-interface UseMdxProps {
+export interface UseMdxProps {
     html: string;
     refCtr: React.MutableRefObject<HTMLElement | null>;
     components?: MDXComponents;

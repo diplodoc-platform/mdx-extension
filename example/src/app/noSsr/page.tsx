@@ -7,8 +7,7 @@ import '@diplodoc/transform/dist/css/yfm.css';
 import transform from '@diplodoc/transform';
 import DefaultPlugins from '@diplodoc/transform/lib/plugins';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {MdxPluginEnv, mdxPlugin, useMdx} from '@plugin';
-import type {OutputType} from '@diplodoc/transform/lib/typings';
+import {isWithMdxArtifacts, mdxPlugin, useMdx} from '@plugin';
 
 const NoSsrPage: React.FC = () => {
     const refYfm = useRef<HTMLDivElement>(null);
@@ -18,7 +17,9 @@ const NoSsrPage: React.FC = () => {
             needToSanitizeHtml: false,
             useCommonAnchorButtons: true,
             plugins: [...DefaultPlugins, mdxPlugin()],
-        }) as unknown as OutputType & {result: OutputType['result'] & MdxPluginEnv};
+        });
+
+        isWithMdxArtifacts(result);
 
         return result;
     }, []);

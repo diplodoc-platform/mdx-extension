@@ -1,3 +1,3 @@
-import config from '@gravity-ui/prettier-config';
+const config = require('@gravity-ui/prettier-config');
 
-export default config;
+module.exports = config;

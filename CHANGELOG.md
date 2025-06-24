@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.2.1...v1.3.0) (2025-06-24)
+
+
+### Features
+
+* **build:** add commonjs ([#23](https://github.com/diplodoc-platform/mdx-extension/issues/23)) ([fc29349](https://github.com/diplodoc-platform/mdx-extension/commit/fc293493b5eb4b2cc9d20db94a230c03f9375ec6))
+
 ## [1.2.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.2.0...v1.2.1) (2025-06-23)
 
 

@@ -25,7 +25,7 @@ const config: Configuration = {
         path: path.resolve('./build/cjs'),
         libraryTarget: 'commonjs2',
     },
-    externals: ['react', 'react-dom', 'react/jsx-runtime'],
+    externals: [/^react(\/.*)?/, /^react-dom(\/.*)?/],
 };
 
 export default config;

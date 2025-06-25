@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.3.0...v1.3.1) (2025-06-25)
+
+
+### Bug Fixes
+
+* **cjs:** exclude jsx-runtime ([#25](https://github.com/diplodoc-platform/mdx-extension/issues/25)) ([d1adfbc](https://github.com/diplodoc-platform/mdx-extension/commit/d1adfbc3b05d98335385f78b5d76d9262800ce76))
+
 ## [1.3.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.2.1...v1.3.0) (2025-06-24)
 
 

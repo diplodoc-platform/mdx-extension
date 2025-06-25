@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/diplodoc-platform/mdx-extension/compare/v1.3.1...v1.3.2) (2025-06-25)
+
+
+### Bug Fixes
+
+* **cjs:** exclude react/*, react-dom/* ([#27](https://github.com/diplodoc-platform/mdx-extension/issues/27)) ([25ca5d4](https://github.com/diplodoc-platform/mdx-extension/commit/25ca5d4fec51c4cf052814fc2cb4ba943aa53d00))
+
 ## [1.3.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.3.0...v1.3.1) (2025-06-25)
 
 

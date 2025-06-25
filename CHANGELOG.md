@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.3](https://github.com/diplodoc-platform/mdx-extension/compare/v1.3.2...v1.3.3) (2025-06-25)
+
+
+### Bug Fixes
+
+* **types:** export collect plugin options ([#29](https://github.com/diplodoc-platform/mdx-extension/issues/29)) ([9e38c6c](https://github.com/diplodoc-platform/mdx-extension/commit/9e38c6cc4828bc5ec7a7adb81198b744fc137c77))
+
 ## [1.3.2](https://github.com/diplodoc-platform/mdx-extension/compare/v1.3.1...v1.3.2) (2025-06-25)
 
 

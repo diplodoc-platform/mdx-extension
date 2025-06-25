@@ -4,11 +4,11 @@ import {getAsyncSsrRenderer, getSsrRenderer} from './utils';
 import type {MdxArtifacts} from './types';
 import type {GetAsyncSsrRendererProps} from './utils/getAsyncSsrRenderer';
 
-interface Options extends Omit<GetSsrRendererProps, 'components'> {
+export interface GetMdxCollectPluginOptions extends Omit<GetSsrRendererProps, 'components'> {
     tagNames?: string[];
 }
 
-export const getMdxCollectPlugin = (options: Options) => {
+export const getMdxCollectPlugin = (options: GetMdxCollectPluginOptions) => {
     const {tagNames, ...rendererOptions} = options;
 
     const render = getSsrRenderer(rendererOptions);
@@ -28,11 +28,12 @@ export const getMdxCollectPlugin = (options: Options) => {
     return plugin;
 };
 
-interface AsyncOptions extends Omit<GetAsyncSsrRendererProps, 'components'> {
+export interface GetAsyncMdxCollectPluginOptions
+    extends Omit<GetAsyncSsrRendererProps, 'components'> {
     tagNames?: string[];
 }
 
-export const getAsyncMdxCollectPlugin = (options: AsyncOptions) => {
+export const getAsyncMdxCollectPlugin = (options: GetAsyncMdxCollectPluginOptions) => {
     const {tagNames, ...rendererOptions} = options;
 
     const {render, renderAsync} = getAsyncSsrRenderer(rendererOptions);

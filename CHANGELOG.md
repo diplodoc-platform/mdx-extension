@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.3.3...v1.4.0) (2025-06-29)
+
+
+### Features
+
+* **recma:** add mdx validation plugin ([#31](https://github.com/diplodoc-platform/mdx-extension/issues/31)) ([d13b658](https://github.com/diplodoc-platform/mdx-extension/commit/d13b658cd102b16ad1ee40d96767548267648f17))
+
 ## [1.3.3](https://github.com/diplodoc-platform/mdx-extension/compare/v1.3.2...v1.3.3) (2025-06-25)
 
 

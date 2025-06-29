@@ -21,6 +21,7 @@ yarn add @diplodoc/mdx-extension
   - Explicit `<MDX>...</MDX>` tags
   - Short form JSX fragments `<>...</>`
   - Direct React component usage `<Component />`
+  - Built-in security with MDX input validation
 
 ## Usage
 
@@ -38,13 +39,38 @@ const result = transform(markdownContent, {
 });
 ```
 
+### Enabling MDX Input Validation
+
+To enable security validation of MDX input and prevent execution of potentially unsafe code:
+
+```typescript
+import {mdxPlugin, validateMdx} from '@diplodoc/mdx-extension';
+
+const result = transform(markdownContent, {
+  plugins: [
+    ...DefaultPlugins,
+    mdxPlugin({
+      compileOptions: {
+        recmaPlugins: [validateMdx],
+      },
+    }),
+  ],
+});
+```
+
+This will:
+
+- Validate all user-provided MDX/JSX content
+- Prevent execution of unsafe code on the server
+- Throw validation errors for suspicious patterns
+
 ### Client-side Rendering (CSR)
 
 ```tsx
 import React, {useMemo, useRef} from 'react';
 import transform from '@diplodoc/transform';
 import DefaultPlugins from '@diplodoc/transform/lib/plugins';
-import {mdxPlugin, useMdx, isWithMdxArtifacts} from '@diplodoc/mdx-extension';
+import {mdxPlugin, useMdx, isWithMdxArtifacts, validateMdx} from '@diplodoc/mdx-extension';
 
 const Components = {
   CustomComponent: (props) => <div {...props}>Custom</div>,
@@ -65,7 +91,14 @@ function App() {
 
   const {html, mdxArtifacts} = useMemo(() => {
     const {result} = transform(CONTENT, {
-      plugins: [...DefaultPlugins, mdxPlugin()],
+      plugins: [
+        ...DefaultPlugins,
+        mdxPlugin({
+          compileOptions: {
+            recmaPlugins: [validateMdx],
+          },
+        }),
+      ],
     });
 
     isWithMdxArtifacts(result);
@@ -90,7 +123,7 @@ function App() {
 import React from 'react';
 import transform from '@diplodoc/transform';
 import DefaultPlugins from '@diplodoc/transform/lib/plugins';
-import {mdxPlugin, useMdxSsr, getSsrRenderer} from '@diplodoc/mdx-extension';
+import {mdxPlugin, useMdxSsr, getSsrRenderer, validateMdx} from '@diplodoc/mdx-extension';
 
 const Components = {
   ServerComponent: (props) => <strong {...props}>Server Rendered</strong>,
@@ -105,6 +138,9 @@ const CONTENT = `
 export async function getServerSideProps() {
   const render = await getSsrRenderer({
     components: Components,
+    compileOptions: {
+      recmaPlugins: [validateMdx],
+    },
   });
 
   const {result} = transform(CONTENT, {

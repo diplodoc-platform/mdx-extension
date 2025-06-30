@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.4.0...v1.4.1) (2025-06-30)
+
+
+### Bug Fixes
+
+* **validateMdx:** strict check ([#33](https://github.com/diplodoc-platform/mdx-extension/issues/33)) ([28b6872](https://github.com/diplodoc-platform/mdx-extension/commit/28b6872a96ecada297f42c978a041054cac6cbb0))
+
 ## [1.4.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.3.3...v1.4.0) (2025-06-29)
 
 

@@ -32,6 +32,53 @@ function assert<T>(condition: T, message?: string): asserts condition {
     }
 }
 
+function hasAllProperties<T extends object, U extends object>(
+    obj: T,
+    properties: U,
+): asserts obj is T & U {
+    for (const [key, value] of Object.entries(properties)) {
+        if (!(key in obj)) {
+            throw new Error(`Missing property: ${key}`);
+        }
+
+        const objValue = obj[key as keyof T];
+
+        if (typeof value === 'object' && value !== null) {
+            if (Array.isArray(value)) {
+                if (!Array.isArray(objValue)) {
+                    throw new Error(`Property ${key} must be an array`);
+                }
+                if (value.length !== objValue.length) {
+                    throw new Error(
+                        `Array length mismatch for ${key}: expected ${value.length}, got ${objValue.length}`,
+                    );
+                }
+                objValue.forEach((item, index) => {
+                    hasAllProperties(item, value[index]);
+                });
+            } else {
+                if (typeof objValue !== 'object' || objValue === null) {
+                    throw new Error(`Property ${key} must be an object`);
+                }
+                hasAllProperties(objValue, value);
+            }
+        } else if (objValue !== value) {
+            throw new Error(`Mismatched property value: ${key}`);
+        }
+    }
+}
+
+const isEqual = (...args: Parameters<typeof hasAllProperties>) => {
+    try {
+        hasAllProperties(...args);
+        return true;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_err) {
+        // pass
+    }
+    return false;
+};
+
 type NodeType =
     | Program
     | Directive
@@ -80,7 +127,7 @@ function validateAST(ast: Program): void {
 
             if (node.type === 'Property') {
                 if (!['Literal', 'Identifier'].includes(node.key.type)) {
-                    throw new Error(`Value type ${node.key.type} is not allowed`);
+                    throw new Error(`Component prop type '${node.key.type}' is not allowed`);
                 }
                 checkJsxPropValue(node.value);
                 return;
@@ -107,6 +154,7 @@ function validateAST(ast: Program): void {
                 node.callee.type === 'Identifier' &&
                 ['_jsxs', '_jsx'].includes(node.callee.name)
             ) {
+                // will be checked in traverse
                 return;
             }
 
@@ -114,16 +162,34 @@ function validateAST(ast: Program): void {
                 return;
             }
 
-            throw new Error(`Value type ${node.type} is not allowed`);
+            throw new Error(`Component prop value type '${node.type}' is not allowed here`);
         }
 
-        function checkJsxProp(node: SpreadElement | Property) {
+        function checkJsxProp(
+            node: SpreadElement | Property,
+            component: SpreadElement | Expression,
+        ) {
+            const isSpreadProps = isEqual(node, {
+                type: 'SpreadElement',
+                argument: {
+                    type: 'Identifier',
+                    name: 'props',
+                },
+            });
+            if (
+                component.type === 'Identifier' &&
+                ['MDXLayout', '_createMdxContent'].includes(component.name) &&
+                isSpreadProps
+            ) {
+                return;
+            }
+
             if (node.type !== 'Property') {
-                throw new Error(`Node type ${node.type} is not allowed`);
+                throw new Error(`Component prop type '${node.type}' is not allowed`);
             }
 
             if (!['Literal', 'Identifier'].includes(node.key.type)) {
-                throw new Error(`Node key type ${node.key.type} is not allowed`);
+                throw new Error(`Component prop type '${node.key.type}' is not allowed`);
             }
 
             let name = '';
@@ -134,7 +200,7 @@ function validateAST(ast: Program): void {
                 name = String(node.key.value);
             }
             if (['dangerouslySetInnerHTML', 'ref'].includes(name) || /^on[A-Z]/.test(name)) {
-                throw new Error(`Key name ${name} is not allowed`);
+                throw new Error(`Component prop '${name}' is not allowed`);
             }
 
             checkJsxPropValue(node.value);
@@ -147,7 +213,7 @@ function validateAST(ast: Program): void {
             const [component, componentParams] = node.arguments;
 
             assert(componentParams.type === 'ObjectExpression');
-            componentParams.properties.forEach(checkJsxProp);
+            componentParams.properties.forEach((prop) => checkJsxProp(prop, component));
 
             if (
                 component.type === 'Identifier' &&
@@ -157,12 +223,19 @@ function validateAST(ast: Program): void {
                 return;
             }
 
-            if (
-                component.type === 'MemberExpression' &&
-                component.object.type === 'Identifier' &&
-                component.object.name === '_components' &&
-                component.property.type === 'Identifier'
-            ) {
+            const isComponentMatch = isEqual(component, {
+                type: 'MemberExpression',
+                object: {
+                    type: 'Identifier',
+                    name: '_components',
+                },
+                property: {
+                    type: 'Identifier',
+                },
+                computed: false,
+                optional: false,
+            });
+            if (isComponentMatch) {
                 return;
             }
 
@@ -170,7 +243,7 @@ function validateAST(ast: Program): void {
                 return;
             }
 
-            throw new Error(`Component '${component.type}' is not allowed`);
+            throw new Error(`Component tag type '${component.type}' is not allowed here`);
         }
 
         function check(node: NodeType): void | boolean {
@@ -180,19 +253,27 @@ function validateAST(ast: Program): void {
                 case node.type === 'FunctionDeclaration': {
                     assert(
                         node.id.type === 'Identifier',
-                        `FunctionDeclaration id.type ${node.id.type} is not allowed`,
+                        `${node.type}.id.type ${node.id.type} is not allowed`,
                     );
-                    if (['MDXContent'].includes(node.id.name)) {
-                        return true;
-                    }
-                    if (['_missingMdxReference', '_createMdxContent'].includes(node.id.name)) {
+
+                    if (
+                        ['MDXContent', '_missingMdxReference', '_createMdxContent'].includes(
+                            node.id.name,
+                        )
+                    ) {
                         return;
                     }
-                    throw new Error(`FunctionDeclaration ${node.id.name} is not allowed`);
+
+                    throw new Error(`${node.type} is not allowed here`);
                 }
                 case node.type === 'VariableDeclarator': {
-                    if (node.id.type === 'Identifier' && node.id.name === '_importMetaUrl') {
-                        throw new Error(`Imports is not allowed`);
+                    const isMetaUrlMatch = isEqual(node.id, {
+                        type: 'Identifier',
+                        name: '_importMetaUrl',
+                    });
+                    if (isMetaUrlMatch) {
+                        assert(node.id.type === 'Identifier');
+                        throw new Error(`${node.type}.id.name ${node.id.name} is not allowed`);
                     }
 
                     if (
@@ -203,53 +284,137 @@ function validateAST(ast: Program): void {
                     }
 
                     if (node.id.type === 'ObjectPattern') {
-                        if (node.init?.type === 'Identifier' && node.init.name === '_components') {
-                            return;
-                        }
-                        if (
-                            node.init?.type === 'MemberExpression' &&
-                            node.init.object.type === 'Identifier' &&
-                            node.init.object.name === 'arguments' &&
-                            node.init.property.type === 'Literal' &&
-                            node.init.property.value === 0
-                        ) {
+                        const isComponentsMatch = isEqual(node, {
+                            init: {
+                                type: 'Identifier',
+                                name: '_components',
+                            },
+                        });
+                        if (isComponentsMatch) {
                             return;
                         }
 
-                        throw new Error(`Object pattern is not allowed`);
+                        const isFirstArgMatch = isEqual(node, {
+                            init: {
+                                type: 'MemberExpression',
+                                object: {
+                                    type: 'Identifier',
+                                    name: 'arguments',
+                                },
+                                property: {
+                                    type: 'Literal',
+                                    value: 0,
+                                },
+                                computed: true,
+                                optional: false,
+                            },
+                        });
+                        if (isFirstArgMatch) {
+                            return;
+                        }
+
+                        const isComponentsSpreadMatch = isEqual(node, {
+                            id: {
+                                type: 'ObjectPattern',
+                                properties: [
+                                    {
+                                        type: 'Property',
+                                        kind: 'init',
+                                        key: {
+                                            type: 'Identifier',
+                                            name: 'wrapper',
+                                        },
+                                        value: {
+                                            type: 'Identifier',
+                                            name: 'MDXLayout',
+                                        },
+                                        method: false,
+                                        shorthand: false,
+                                        computed: false,
+                                    },
+                                ],
+                            },
+                            init: {
+                                type: 'LogicalExpression',
+                                operator: '||',
+                                left: {
+                                    type: 'MemberExpression',
+                                    object: {
+                                        type: 'Identifier',
+                                        name: 'props',
+                                    },
+                                    property: {
+                                        type: 'Identifier',
+                                        name: 'components',
+                                    },
+                                    computed: false,
+                                    optional: false,
+                                },
+                                right: {
+                                    type: 'ObjectExpression',
+                                    properties: [],
+                                },
+                            },
+                        });
+                        if (isComponentsSpreadMatch) {
+                            return;
+                        }
+
+                        throw new Error(`${node.type}.id.type ${node.id.type} is not allowed here`);
                     }
 
-                    throw new Error(`VariableDeclarator type ${node.id.type} is not allowed`);
+                    throw new Error(`${node.type}.id.type ${node.id.type} is not allowed`);
                 }
                 case node.type === 'MemberExpression': {
-                    if (
-                        node.object.type === 'Identifier' &&
-                        node.object.name === 'arguments' &&
-                        node.property.type === 'Literal' &&
-                        node.property.value === 0
-                    ) {
+                    const isFirstArgMatch = isEqual(node, {
+                        object: {
+                            type: 'Identifier',
+                            name: 'arguments',
+                        },
+                        property: {
+                            type: 'Literal',
+                            value: 0,
+                        },
+                        computed: true,
+                        optional: false,
+                    });
+                    if (isFirstArgMatch) {
                         return;
                     }
 
-                    if (
-                        node.object.type === 'Identifier' &&
-                        node.object.name === 'props' &&
-                        node.property.type === 'Identifier' &&
-                        node.property.name === 'components'
-                    ) {
+                    const isPropsComponentsMatch = isEqual(node, {
+                        object: {
+                            type: 'Identifier',
+                            name: 'props',
+                        },
+                        property: {
+                            type: 'Identifier',
+                            name: 'components',
+                        },
+                        computed: false,
+                        optional: false,
+                    });
+                    if (isPropsComponentsMatch) {
                         return;
                     }
 
-                    if (
-                        node.object.type === 'Identifier' &&
-                        node.object.name === '_components' &&
-                        node.property.type === 'Identifier'
-                    ) {
+                    const isComponentsMatch = isEqual(node, {
+                        object: {
+                            type: 'Identifier',
+                            name: '_components',
+                        },
+                        property: {
+                            type: 'Identifier',
+                        },
+                        computed: false,
+                        optional: false,
+                    });
+                    if (isComponentsMatch) {
                         return;
                     }
 
                     throw new Error(
-                        `MemberExpression object.type ${node.object.type} is not allowed`,
+                        `${node.type}.object.type ${node.object.type} is not allowed here`,
                     );
                 }
                 case node.type === 'CallExpression': {
@@ -264,54 +429,107 @@ function validateAST(ast: Program): void {
 
                     if (['_createMdxContent', '_missingMdxReference'].includes(node.callee.name)) {
                         if (node.callee.name === '_missingMdxReference') {
-                            const firstArg = node.arguments?.[0];
-                            if (firstArg?.type === 'Literal') {
-                                componentSet.add(String(firstArg.value));
+                            if (node.arguments.length) {
+                                const [firstArg] = node.arguments;
+                                if (firstArg.type === 'Literal') {
+                                    componentSet.add(String(firstArg.value));
+                                }
                             }
                         }
                         return;
                     }
 
-                    throw new Error(`Call '${node.callee.name}' is not allowed`);
+                    throw new Error(`${node.type} is not allowed here`);
                 }
                 case node.type === 'NewExpression': {
-                    if (node.callee.type === 'Identifier' && node.callee.name === 'Error') {
+                    const isErrorMatch = isEqual(node, {
+                        type: 'NewExpression',
+                        callee: {
+                            type: 'Identifier',
+                            name: 'Error',
+                        },
+                    });
+                    if (isErrorMatch) {
                         return;
                     }
-                    throw new Error(`Node type '${node.type}' is not allowed`);
+
+                    throw new Error(`${node.type} is not allowed here`);
                 }
                 case node.type === 'SpreadElement': {
-                    if (
-                        node.argument.type === 'MemberExpression' &&
-                        node.argument.object.type === 'Identifier' &&
-                        node.argument.object.name === 'props' &&
-                        node.argument.property.type === 'Identifier' &&
-                        node.argument.property.name === 'components'
-                    ) {
+                    const isPropsComponentsMatch = isEqual(node, {
+                        type: 'SpreadElement',
+                        argument: {
+                            type: 'MemberExpression',
+                            object: {
+                                type: 'Identifier',
+                                name: 'props',
+                            },
+                            property: {
+                                type: 'Identifier',
+                                name: 'components',
+                            },
+                            computed: false,
+                            optional: false,
+                        },
+                    });
+                    if (isPropsComponentsMatch) {
                         return;
                     }
 
-                    if (node.argument.type === 'Identifier' && node.argument.name === 'props') {
+                    const isPropsMatch = isEqual(node, {
+                        type: 'SpreadElement',
+                        argument: {
+                            type: 'Identifier',
+                            name: 'props',
+                        },
+                    });
+                    if (isPropsMatch) {
                         return;
                     }
 
-                    throw new Error(`Node type '${node.type}' is not allowed`);
+                    throw new Error(`${node.type} is not allowed here`);
+                }
+                case node.type === 'LogicalExpression': {
+                    const isPropsComponentsMatch = isEqual(node, {
+                        type: 'LogicalExpression',
+                        operator: '||',
+                        left: {
+                            type: 'MemberExpression',
+                            object: {
+                                type: 'Identifier',
+                                name: 'props',
+                            },
+                            property: {
+                                type: 'Identifier',
+                                name: 'components',
+                            },
+                            computed: false,
+                            optional: false,
+                        },
+                        right: {
+                            type: 'ObjectExpression',
+                            properties: [],
+                        },
+                    });
+                    if (isPropsComponentsMatch) {
+                        return;
+                    }
+
+                    throw new Error(`${node.type} is not allowed here`);
                 }
                 case node.type === 'AwaitExpression':
                 case node.type === 'YieldExpression':
                 case node.type === 'AssignmentExpression':
                 case node.type === 'ImportExpression':
                 case node.type === 'FunctionExpression':
-                case node.type === 'LogicalExpression':
                 case node.type === 'ArrowFunctionExpression': {
-                    throw new Error(`Node type '${node.type}' is not allowed`);
+                    throw new Error(`${node.type} is not allowed`);
                 }
             }
         }
 
         if (check(node)) return;
 
-        // Рекурсивный обход дочерних узлов
         for (const key in node) {
             if (key === 'type' || !Object.prototype.hasOwnProperty.call(node, key)) continue;
 

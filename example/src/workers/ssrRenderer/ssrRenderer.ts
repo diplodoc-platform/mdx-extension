@@ -7,8 +7,7 @@ import {isWithMdxArtifacts, mdxPlugin} from '@plugin';
 import {PURE_COMPONENTS, SSR_COMPONENTS} from '@/components';
 import getAsyncSsrRenderer from '../../../../src/utils/getAsyncSsrRenderer';
 import assert from 'node:assert';
-import {minify} from 'terser';
-import * as babel from '@babel/core';
+import {transform as swcTransform} from '@swc/core';
 
 export interface SsrRendererWorker {
     getContent: typeof getContent;
@@ -38,31 +37,22 @@ const getContent = async (content: string) => {
     for (let i = 0, id; (id = keys[i]); i++) {
         const code = mdxArtifacts.idMdx[id];
 
-        const parsedAst = await babel.parseAsync(code, {
-            parserOpts: {allowReturnOutsideFunction: true},
-        });
-        assert(parsedAst);
-
-        const transformedResult = await babel.transformFromAstAsync(parsedAst, code, {
-            presets: ['@babel/preset-env'],
-            ast: false,
-            code: true,
-        });
-        assert(transformedResult?.code);
-
-        const {code: miniCode = ''} = await minify(transformedResult.code, {
-            mangle: {
-                module: true,
+        const result = await swcTransform(code, {
+            jsc: {
+                parser: {
+                    syntax: 'ecmascript',
+                    allowReturnOutsideFunction: true,
+                },
+                minify: {
+                    mangle: {
+                        topLevel: true,
+                    },
+                },
             },
-            compress: {
-                module: true,
-            },
-            parse: {
-                bare_returns: true,
-            },
+            minify: true,
         });
 
-        mdxArtifacts.idMdx[id] = miniCode;
+        mdxArtifacts.idMdx[id] = result.code;
     }
 
     return {html: htmlWithMdx, mdxArtifacts};

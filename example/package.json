@@ -18,6 +18,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@babel/core": "^7.27.7",
+    "@babel/preset-env": "^7.27.2",
     "@diplodoc/transform": "^4.57.3",
     "@gravity-ui/icons": "^2.13.0",
     "@gravity-ui/navigation": "^3.1.1",
@@ -32,6 +34,7 @@
     "next": "^15.0.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "terser": "^5.43.1",
     "threads": "^1.7.0"
   },
   "devDependencies": {
@@ -41,6 +44,7 @@
     "@gravity-ui/stylelint-config": "^4.0.1",
     "@gravity-ui/tsconfig": "^1.0.0",
     "@svgr/webpack": "^8.1.0",
+    "@types/babel__core": "^7.20.5",
     "@types/markdown-it": "^13.0.9",
     "@types/node": "^20.17.9",
     "@types/react": "^18.3.14",

@@ -294,6 +294,33 @@ function validateAST(ast: Program): void {
                             return;
                         }
 
+                        const isObjectPatternFromComponentsProps = isEqual(node, {
+                            init: {
+                                type: 'LogicalExpression',
+                                operator: '||',
+                                left: {
+                                    type: 'MemberExpression',
+                                    object: {
+                                        type: 'Identifier',
+                                        name: 'props',
+                                    },
+                                    property: {
+                                        type: 'Identifier',
+                                        name: 'components',
+                                    },
+                                    computed: false,
+                                    optional: false,
+                                },
+                                right: {
+                                    type: 'ObjectExpression',
+                                    properties: [],
+                                },
+                            },
+                        });
+                        if (isObjectPatternFromComponentsProps) {
+                            return;
+                        }
+
                         const isFirstArgMatch = isEqual(node, {
                             init: {
                                 type: 'MemberExpression',

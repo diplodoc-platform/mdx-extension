@@ -25,15 +25,6 @@ const getAsyncSsrRenderer = ({
 }: GetAsyncSsrRendererProps) => {
     const componentsNames = Object.keys(components || {});
 
-    const usedComponents = new Set<string>();
-    const combinedComponents = wrapObject(
-        {
-            ...components,
-            ...pureComponents,
-        },
-        (name) => usedComponents.add(name),
-    );
-
     const render = async (id: string, mdx: string) => {
         const vFile = await compile(mdx, {
             ...compileOptions,
@@ -48,7 +39,15 @@ const getAsyncSsrRenderer = ({
         const {runtime, init} = getMdxRuntimeWithHook();
         const {default: componentFn} = await run(vFile, runtime as unknown as RunOptions);
 
-        usedComponents.clear();
+        const usedComponents = new Set<string>();
+        const combinedComponents = wrapObject(
+            {
+                ...components,
+                ...pureComponents,
+            },
+            (name) => usedComponents.add(name),
+        );
+
         const asyncWrapper = componentFn({
             components: combinedComponents,
         }) as unknown as AsyncComponentWrapper;
@@ -98,11 +97,17 @@ const getAsyncSsrRenderer = ({
         let input = inputOrig;
         const {idMdx} = mdxArtifacts;
 
-        const items = Array.from(idFragment.entries());
+        const items: {id: string; replacer: string}[] = [];
+        const promises: ReturnType<typeof render>[] = [];
+        idFragment.forEach(({replacer, mdx}, id) => {
+            promises.push(render(id, mdx));
+            items.push({id, replacer});
+        });
+        const promiseResults = await Promise.all(promises);
 
         for (let item, i = 0; (item = items[i]); i++) {
-            const [id, {replacer, mdx}] = item;
-            const {html, code} = await render(id, mdx);
+            const {id, replacer} = item;
+            const {html, code} = promiseResults[i];
             input = input.replace(replacer, () => html);
             if (code) {
                 idMdx[id] = code;

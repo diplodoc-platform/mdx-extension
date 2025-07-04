@@ -22,7 +22,10 @@ const getSsrRenderer = ({components, pureComponents, compileOptions}: GetSsrRend
             ...components,
             ...pureComponents,
         },
-        (name) => usedComponents.add(name),
+        (name, _component) => {
+            usedComponents.add(name);
+            // return getPortalFallback(component as React.ComponentType);
+        },
     );
 
     const render = (id: string, mdx: string) => {

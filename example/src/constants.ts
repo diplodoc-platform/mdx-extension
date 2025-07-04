@@ -1,4 +1,12 @@
 export const CONTENT = `
+
+Context:
+
+<CurrentValue/>
+
+`;
+
+export const CONTENT1 = `
 # @diplodoc/mdx-extension Demo
 
 This page demonstrates the capabilities of \`@diplodoc/mdx-extension\` for embedding MDX/JSX within markdown content.

@@ -5,8 +5,9 @@ import {Counter} from '@/Components/Counter/Counter';
 import {TabLocal, TabsLocal} from '@/Components/Tabs/Tabs';
 import KatexFormula from '@/Components/KatexFormula/KatexFormula';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {withInitialProps} from '@plugin';
+import {withInitialProps, withPortal} from '@plugin';
 import {getInitialProps} from '@/Components/Counter/getInitialProps';
+import CurrentValue from '@/Components/CurrentValue/CurrentValue';
 
 export const COMPONENTS = {
     Button,
@@ -14,6 +15,7 @@ export const COMPONENTS = {
     Tabs: TabsLocal,
     Tab: TabLocal,
     MermaidDiagram,
+    CurrentValue: withPortal(CurrentValue, () => 'Loading...'),
 };
 
 export const SSR_COMPONENTS = {

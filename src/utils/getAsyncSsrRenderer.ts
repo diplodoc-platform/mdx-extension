@@ -1,16 +1,12 @@
 import type {MDXComponents} from 'mdx/types';
-import {type CompileOptions, type RunOptions, compile, run} from '@mdx-js/mdx';
+import {compile, type CompileOptions, run, type RunOptions} from '@mdx-js/mdx';
 import React from 'react';
 import type {MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {escapeAttribute, isEmptyObject, wrapObject} from './internal/common';
+import {escapeAttribute, generateUniqueId, isEmptyObject, wrapObject} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
-import {
-    AsyncComponentWrapper,
-    generateUniqueId,
-    getMdxRuntimeWithHook,
-} from './internal/asyncRenderTools';
+import {AsyncComponentWrapper, getMdxRuntimeWithHook,} from './internal/asyncRenderTools';
 
 export interface GetAsyncSsrRendererProps {
     components?: MDXComponents;
@@ -45,7 +41,10 @@ const getAsyncSsrRenderer = ({
                 ...components,
                 ...pureComponents,
             },
-            (name) => usedComponents.add(name),
+            (name, _component) => {
+                usedComponents.add(name);
+                // return getPortalFallback(component as React.ComponentType);
+            },
         );
 
         const asyncWrapper = componentFn({

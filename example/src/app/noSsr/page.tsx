@@ -1,5 +1,5 @@
 'use client';
-import React, {useMemo, useRef} from 'react';
+import React, {Fragment, useMemo, useRef} from 'react';
 import {CONTENT} from '@/constants';
 import {COMPONENTS, PURE_COMPONENTS} from '@/components';
 
@@ -24,7 +24,7 @@ const NoSsrPage: React.FC = () => {
         return result;
     }, []);
 
-    useMdx({
+    const portalNodes = useMdx({
         refCtr: refYfm,
         html,
         components: COMPONENTS,
@@ -32,7 +32,12 @@ const NoSsrPage: React.FC = () => {
         mdxArtifacts,
     });
 
-    return <div ref={refYfm} className={'yfm'} />;
+    return (
+        <Fragment>
+            <div ref={refYfm} className={'yfm'} />
+            {portalNodes}
+        </Fragment>
+    );
 };
 
 export default NoSsrPage;

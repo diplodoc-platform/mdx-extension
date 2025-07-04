@@ -2,6 +2,7 @@ import React from 'react';
 import type {MdxArtifacts} from '../types';
 import {idMdxToComponents, renderMdxComponents} from '../utils/internal/common';
 import type {MDXComponents} from 'mdx/types';
+import usePortals from './usePortals';
 
 export interface UseMdxProps {
     html: string;
@@ -13,6 +14,8 @@ export interface UseMdxProps {
 
 const useMdx = ({refCtr, html, components, pureComponents, mdxArtifacts}: UseMdxProps) => {
     const refUmount = React.useRef(() => {});
+
+    const {portalsNode, setPortal} = usePortals();
 
     const combinedComponents = React.useMemo(
         () => ({...components, ...pureComponents}),
@@ -63,8 +66,11 @@ const useMdx = ({refCtr, html, components, pureComponents, mdxArtifacts}: UseMdx
             idMdxComponent,
             ctr,
             components: combinedComponents,
+            setPortal,
         });
-    }, [refCtr, html, combinedComponents, idMdxComponent]);
+    }, [refCtr, html, combinedComponents, idMdxComponent, setPortal]);
+
+    return portalsNode;
 };
 
 export default useMdx;

@@ -43,13 +43,10 @@ export const renderMdxComponents = ({
 
         const mdxState = node?.dataset?.mdxState ? JSON.parse(node.dataset.mdxState) : null;
 
-        const reactNode = React.createElement(MdxPortalSetterCtx.Provider, {
-            value: setPortal,
-            children: React.createElement(MdxStateCtx.Provider, {
-                value: mdxState,
-                children: React.createElement(Content, {
-                    components,
-                }),
+        const contentNode = React.createElement(MdxStateCtx.Provider, {
+            value: mdxState,
+            children: React.createElement(Content, {
+                components,
             }),
         });
 
@@ -62,9 +59,13 @@ export const renderMdxComponents = ({
             setPortal({
                 id,
                 node,
-                reactNode,
+                reactNode: contentNode,
             });
         } else {
+            const reactNode = React.createElement(MdxPortalSetterCtx.Provider, {
+                value: setPortal,
+                children: contentNode,
+            });
             root = nodeRootMap.get(node);
             if (root) {
                 root.render(reactNode);

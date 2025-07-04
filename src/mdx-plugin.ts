@@ -6,11 +6,11 @@ import getRender from './utils/getRender';
 import type {RuleCore} from 'markdown-it/lib/parser_core';
 import type {Token} from 'markdown-it';
 import {replaceBlocks} from './utils/internal/plugin';
-import type {MdxBody} from './utils/internal/types';
+import type {GetHtmlProps, MdxBody} from './utils/internal/types';
 import {InternalTagName} from './constants';
 
 interface Options {
-    render?: (mdx: string, mdxArtifacts: MdxArtifacts) => string;
+    render?: (props: GetHtmlProps) => string;
     tagNames?: string[];
     isTestMode?: boolean;
 }
@@ -75,11 +75,11 @@ const mdxPlugin = (options?: Options) => {
         md.core.ruler.push('mdx-replace-back', coreReplaceBack);
 
         const blockPlugin: RuleBlock = (state, startLine, endLine, silent) => {
-            const {env} = state;
-            if (env) {
-                env.mdxArtifacts = env.mdxArtifacts || {idMdx: {}};
-            }
-            const {mdxArtifacts} = env;
+            const {env} = state as {env: {mdxArtifacts?: MdxArtifacts}};
+            const mdxArtifacts = (env.mdxArtifacts = env.mdxArtifacts || {
+                idMdx: {},
+                idTagName: {},
+            });
 
             const start = state.bMarks[startLine] + state.tShift[startLine];
 
@@ -102,7 +102,8 @@ const mdxPlugin = (options?: Options) => {
             if (!silent) {
                 const htmlToken = state.push('html_block', '', 0);
                 const id = state.src.slice(start + iTagLen, endPos);
-                htmlToken.content = render(idMdxBody[id].content, mdxArtifacts);
+                const {content, tagName} = idMdxBody[id];
+                htmlToken.content = render({mdx: content, mdxArtifacts, tagName});
                 htmlToken.map = [startLine, line];
 
                 const afterText = state.src.slice(endPos + (iTagLen + 1), state.eMarks[line]);
@@ -123,11 +124,11 @@ const mdxPlugin = (options?: Options) => {
         md.block.ruler.before('table', 'mdx-replacer-block', blockPlugin);
 
         const inlinePlugin: RuleInline = (state, silent) => {
-            const {env} = state;
-            if (env) {
-                env.mdxArtifacts = env.mdxArtifacts || {idMdx: {}};
-            }
-            const {mdxArtifacts} = env;
+            const {env} = state as {env: {mdxArtifacts?: MdxArtifacts}};
+            const mdxArtifacts = (env.mdxArtifacts = env.mdxArtifacts || {
+                idMdx: {},
+                idTagName: {},
+            });
 
             const start = state.pos;
 
@@ -143,7 +144,8 @@ const mdxPlugin = (options?: Options) => {
             if (!silent) {
                 const token = state.push('html_inline', '', 0);
                 const id = state.src.slice(start + iTagLen, endPos);
-                token.content = render(idMdxBody[id].content, mdxArtifacts);
+                const {content, tagName} = idMdxBody[id];
+                token.content = render({mdx: content, mdxArtifacts, tagName});
             }
 
             // eslint-disable-next-line no-param-reassign

@@ -5,8 +5,9 @@ import type {MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
 import {escapeAttribute, generateUniqueId, isEmptyObject, wrapObject} from './internal/common';
-import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
+import {MdxPortalSetterCtx, MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {AsyncComponentWrapper, getMdxRuntimeWithHook} from './internal/asyncRenderTools';
+import type {GetHtmlProps} from './internal/types';
 
 export interface GetAsyncSsrRendererProps {
     components?: MDXComponents;
@@ -20,6 +21,10 @@ const getAsyncSsrRenderer = ({
     compileOptions,
 }: GetAsyncSsrRendererProps) => {
     const componentsNames = Object.keys(components || {});
+    const combinedComponents = {
+        ...components,
+        ...pureComponents,
+    };
 
     const render = async (id: string, mdx: string) => {
         const vFile = await compile(mdx, {
@@ -36,16 +41,12 @@ const getAsyncSsrRenderer = ({
         const {default: componentFn} = await run(vFile, runtime as unknown as RunOptions);
 
         const usedComponents = new Set<string>();
-        const combinedComponents = wrapObject(
-            {
-                ...components,
-                ...pureComponents,
-            },
-            (name) => usedComponents.add(name),
+        const combinedComponentsWatch = wrapObject(combinedComponents, (name) =>
+            usedComponents.add(name),
         );
 
         const asyncWrapper = componentFn({
-            components: combinedComponents,
+            components: combinedComponentsWatch,
         }) as unknown as AsyncComponentWrapper;
         await init(state);
 
@@ -60,11 +61,14 @@ const getAsyncSsrRenderer = ({
         let html = renderToString(
             React.createElement(TAG_NAME, {
                 className: id,
-                children: React.createElement(MdxSetStateCtx.Provider, {
-                    value: setState,
-                    children: React.createElement(MdxStateCtx.Provider, {
-                        value: state,
-                        children: React.createElement(Component),
+                children: React.createElement(MdxPortalSetterCtx.Provider, {
+                    value: () => {},
+                    children: React.createElement(MdxSetStateCtx.Provider, {
+                        value: setState,
+                        children: React.createElement(MdxStateCtx.Provider, {
+                            value: state,
+                            children: React.createElement(Component),
+                        }),
                     }),
                 }),
             }),
@@ -87,26 +91,27 @@ const getAsyncSsrRenderer = ({
         return {html, code};
     };
 
-    const idFragment = new Map<string, {replacer: string; mdx: string}>();
+    const idFragment = new Map<string, {replacer: string; mdx: string; tagName: string}>();
 
     const getHtmlAsync = async (inputOrig: string, mdxArtifacts: MdxArtifacts) => {
         let input = inputOrig;
-        const {idMdx} = mdxArtifacts;
+        const {idMdx, idTagName} = mdxArtifacts;
 
-        const items: {id: string; replacer: string}[] = [];
+        const items: {id: string; replacer: string; tagName: string}[] = [];
         const promises: ReturnType<typeof render>[] = [];
-        idFragment.forEach(({replacer, mdx}, id) => {
+        idFragment.forEach(({replacer, mdx, tagName}, id) => {
             promises.push(render(id, mdx));
-            items.push({id, replacer});
+            items.push({id, replacer, tagName});
         });
         const promiseResults = await Promise.all(promises);
 
         for (let item, i = 0; (item = items[i]); i++) {
-            const {id, replacer} = item;
+            const {id, replacer, tagName} = item;
             const {html, code} = promiseResults[i];
             input = input.replace(replacer, () => html);
             if (code) {
                 idMdx[id] = code;
+                idTagName[id] = tagName;
             }
         }
 
@@ -115,10 +120,10 @@ const getAsyncSsrRenderer = ({
 
     let idx = 0;
 
-    const getHtml = (mdx: string) => {
+    const getHtml = ({mdx, tagName}: GetHtmlProps) => {
         const id = `${MDX_PREFIX}${++idx}`;
         const replacer = `<${TAG_NAME} class="${id}">${generateUniqueId()}</${TAG_NAME}>`;
-        idFragment.set(id, {replacer, mdx});
+        idFragment.set(id, {replacer, mdx, tagName});
         return replacer;
     };
 

@@ -4,6 +4,7 @@ import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import type {MDXComponents, MDXProps} from 'mdx/types';
 import {type MdxPortalCtxSetterProps, MdxPortalSetterCtx, MdxStateCtx} from '../../context';
+import {MdxPortalInnerCtx} from '../../context/MdxPortalInnerCtx';
 
 const nodeRootMap = new WeakMap<Element, Root>();
 const nodeWillUmount = new WeakMap<Element, boolean>();
@@ -13,6 +14,7 @@ interface RenderMdxComponentsProps {
     isSSR?: boolean;
     components?: MDXComponents;
     idMdxComponent: Record<string, React.ComponentType<MDXProps>>;
+    idTagName: Record<string, string>;
     setPortal: (props: MdxPortalCtxSetterProps) => void;
 }
 
@@ -22,6 +24,7 @@ export const renderMdxComponents = ({
     ctr,
     components,
     setPortal,
+    idTagName,
 }: RenderMdxComponentsProps) => {
     const unmountFns = Object.entries(idMdxComponent).map(([id, Content]) => {
         let node = ctr.querySelector<HTMLElement>(`.${id}`);
@@ -47,25 +50,49 @@ export const renderMdxComponents = ({
             }),
         });
 
-        let root = nodeRootMap.get(node);
-        if (root) {
-            root.render(reactNode);
+        const isTopLevelPortal =
+            components && isPortal(components[idTagName[id]] as React.ComponentType);
+
+        let root: Root | undefined;
+        if (isTopLevelPortal) {
+            node.textContent = '';
+            setPortal({
+                id,
+                node,
+                reactNode: React.createElement(MdxPortalInnerCtx.Provider, {
+                    value: true,
+                    children: reactNode,
+                }),
+            });
         } else {
-            const options = {
-                identifierPrefix: id,
-            };
-            if (isSSR) {
-                root = hydrateRoot(node, reactNode, options);
-            } else {
-                root = createRoot(node, options);
+            root = nodeRootMap.get(node);
+            if (root) {
                 root.render(reactNode);
+            } else {
+                const options = {
+                    identifierPrefix: id,
+                };
+                if (isSSR) {
+                    root = hydrateRoot(node, reactNode, options);
+                } else {
+                    root = createRoot(node, options);
+                    root.render(reactNode);
+                }
+                nodeRootMap.set(node, root);
             }
-            nodeRootMap.set(node, root);
         }
 
         return () => {
             nodeWillUmount.set(node, true);
-            setTimeout(() => root.unmount(), 0);
+            if (isTopLevelPortal) {
+                setPortal({
+                    id,
+                    node: null,
+                    reactNode: null,
+                });
+            } else if (root) {
+                setTimeout(() => root.unmount(), 0);
+            }
         };
     });
 
@@ -115,4 +142,10 @@ export function isEmptyObject(obj: Object) {
 
 export function generateUniqueId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
+}
+
+export const componentPortalSet = new Set<React.ComponentType>();
+
+export function isPortal(component: React.ComponentType) {
+    return componentPortalSet.has(component);
 }

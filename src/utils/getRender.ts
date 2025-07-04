@@ -1,6 +1,6 @@
 import {type CompileOptions, compileSync} from '@mdx-js/mdx';
-import type {MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
+import type {GetHtmlProps} from './internal/types';
 
 interface GetRenderProps {
     compileOptions?: CompileOptions;
@@ -9,7 +9,7 @@ interface GetRenderProps {
 const getRender = ({compileOptions}: GetRenderProps = {}) => {
     let idx = 0;
 
-    const getHtml = (mdx: string, mdxArtifacts: MdxArtifacts) => {
+    const getHtml = ({mdx, mdxArtifacts}: GetHtmlProps) => {
         const {idMdx} = mdxArtifacts;
 
         const id = `${MDX_PREFIX}${++idx}`;

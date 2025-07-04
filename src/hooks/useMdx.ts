@@ -28,6 +28,8 @@ const useMdx = ({refCtr, html, components, pureComponents, mdxArtifacts}: UseMdx
         [mdxArtifacts?.idMdx],
     );
 
+    const idTagName = React.useMemo(() => mdxArtifacts?.idTagName ?? {}, [mdxArtifacts]);
+
     // render new html
     React.useLayoutEffect(() => {
         const ctr = refCtr.current;
@@ -64,11 +66,12 @@ const useMdx = ({refCtr, html, components, pureComponents, mdxArtifacts}: UseMdx
 
         refUmount.current = renderMdxComponents({
             idMdxComponent,
+            idTagName,
             ctr,
             components: combinedComponents,
             setPortal,
         });
-    }, [refCtr, html, combinedComponents, idMdxComponent, setPortal]);
+    }, [refCtr, html, combinedComponents, idMdxComponent, idTagName, setPortal]);
 
     return portalsNode;
 };

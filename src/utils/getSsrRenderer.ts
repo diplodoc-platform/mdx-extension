@@ -2,11 +2,11 @@ import type {MDXComponents} from 'mdx/types';
 import {type CompileOptions, compileSync, runSync} from '@mdx-js/mdx';
 import * as runtime from 'react/jsx-runtime';
 import React from 'react';
-import type {MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
 import {escapeAttribute, isEmptyObject, wrapObject} from './internal/common';
-import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
+import {MdxPortalSetterCtx, MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
+import type {GetHtmlProps} from './internal/types';
 
 export interface GetSsrRendererProps {
     components?: MDXComponents;
@@ -48,12 +48,15 @@ const getSsrRenderer = ({components, pureComponents, compileOptions}: GetSsrRend
         let html = renderToString(
             React.createElement(TAG_NAME, {
                 className: id,
-                children: React.createElement(MdxSetStateCtx.Provider, {
-                    value: setState,
-                    children: React.createElement(MdxStateCtx.Provider, {
-                        value: state,
-                        children: React.createElement(Component, {
-                            components: combinedComponents,
+                children: React.createElement(MdxPortalSetterCtx.Provider, {
+                    value: () => {},
+                    children: React.createElement(MdxSetStateCtx.Provider, {
+                        value: setState,
+                        children: React.createElement(MdxStateCtx.Provider, {
+                            value: state,
+                            children: React.createElement(Component, {
+                                components: combinedComponents,
+                            }),
                         }),
                     }),
                 }),
@@ -79,12 +82,13 @@ const getSsrRenderer = ({components, pureComponents, compileOptions}: GetSsrRend
 
     let idx = 0;
 
-    const getHtml = (mdx: string, mdxArtifacts: MdxArtifacts) => {
-        const {idMdx} = mdxArtifacts;
+    const getHtml = ({mdx, mdxArtifacts, tagName}: GetHtmlProps) => {
+        const {idMdx, idTagName} = mdxArtifacts;
         const id = `${MDX_PREFIX}${++idx}`;
         const {html, code} = render(id, mdx);
         if (code) {
             idMdx[id] = code;
+            idTagName[id] = tagName;
         }
         return html;
     };

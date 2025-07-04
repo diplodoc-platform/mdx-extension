@@ -2,6 +2,7 @@ export type {WithInitialProps} from './utils/withInitialProps';
 
 export interface MdxArtifacts {
     idMdx: Record<string, string>;
+    idTagName: Record<string, string>;
 }
 
 export interface MdxPluginEnv {

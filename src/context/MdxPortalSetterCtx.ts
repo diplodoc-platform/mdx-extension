@@ -8,4 +8,4 @@ export interface MdxPortalCtxSetterProps {
 
 export type MdxPortalCtxSetter = (props: MdxPortalCtxSetterProps) => void;
 
-export const MdxPortalSetterCtx = createContext<MdxPortalCtxSetter>(() => {});
+export const MdxPortalSetterCtx = createContext<MdxPortalCtxSetter | null>(null);

@@ -7,32 +7,24 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import {componentWithPortalProps, generateUniqueId} from './internal/common';
+import {generateUniqueId} from './internal/common';
 import {MdxPortalSetterCtx} from '../context';
 
 export interface WithPortalProps {
-    <A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): T;
+    <A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A>;
 }
 
 const withPortal: WithPortalProps = (component, fallback) => {
-    const fallbackLocal = fallback ?? (() => null);
-    componentWithPortalProps.set(
-        component as React.ComponentType,
-        fallbackLocal as React.ComponentType,
-    );
-    return portalCtrWrapper(
-        component as React.ComponentType,
-        fallbackLocal as React.ComponentType,
-    ) as typeof component;
+    return portalCtrWrapper(component, fallback);
 };
 
 export default withPortal;
 
-function portalCtrWrapper(component: React.ComponentType, fallback: React.ComponentType): FC {
+function portalCtrWrapper<A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A> {
     return (props) => {
         const portalSetter = useContext(MdxPortalSetterCtx);
         const ref = useRef<HTMLSpanElement>();
-        const id = useMemo(() => `yfm-${generateUniqueId()}`, []);
+        const id = useMemo(() => generateUniqueId(), []);
         const [mounted, setMounted] = useState(false);
 
         useEffect(() => {
@@ -53,13 +45,16 @@ function portalCtrWrapper(component: React.ComponentType, fallback: React.Compon
             portalSetter({
                 id,
                 node,
-                reactNode: React.createElement(component, props),
+                reactNode: React.createElement(component as React.ComponentType, props as {}),
             });
         }, [id, component, props]);
 
         return React.createElement('span', {
             ref,
-            children: mounted ? null : React.createElement(fallback),
+            children:
+                mounted || !fallback
+                    ? null
+                    : React.createElement(fallback as React.ComponentType, props as {}),
         });
     };
 }

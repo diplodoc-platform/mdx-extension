@@ -113,17 +113,6 @@ export function isEmptyObject(obj: Object) {
     return true;
 }
 
-export const componentWithPortalProps = new WeakMap<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    React.ComponentType<any>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    React.ComponentType<any>
->();
-
-export function getPortalFallback(component: React.ComponentType) {
-    return componentWithPortalProps.get(component);
-}
-
 export function generateUniqueId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }

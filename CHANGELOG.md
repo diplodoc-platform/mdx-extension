@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.5.0...v1.5.1) (2025-07-04)
+
+
+### Bug Fixes
+
+* **withPortal:** add top level portal ([#41](https://github.com/diplodoc-platform/mdx-extension/issues/41)) ([33e9fc5](https://github.com/diplodoc-platform/mdx-extension/commit/33e9fc585055312d2a1c02e7327b75ea98d5d768))
+
 ## [1.5.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.4.2...v1.5.0) (2025-07-04)
 
 

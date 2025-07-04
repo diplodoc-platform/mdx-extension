@@ -1,4 +1,4 @@
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import type {MdxPortalCtxSetterProps} from '../context';
 import {createPortal} from 'react-dom';
 
@@ -16,8 +16,13 @@ const usePortals = () => {
         setPortalNodes(Array.from(idPortalMap.values()));
     }, []);
 
+    const fragment = useMemo(
+        () => React.createElement(React.Fragment, {children: portalNodes}),
+        [portalNodes],
+    );
+
     return {
-        portalsNode: React.createElement(React.Fragment, {children: portalNodes}),
+        portalsNode: fragment,
         setPortal,
     };
 };

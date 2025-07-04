@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import {generateUniqueId} from './internal/common';
 import {MdxPortalSetterCtx} from '../context';
+import {TAG_NAME} from '../constants';
 
 export interface WithPortalProps {
     <A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A>;
@@ -49,7 +50,7 @@ function portalCtrWrapper<A = {}, T = React.ComponentType<A>>(component: T, fall
             });
         }, [id, component, props]);
 
-        return React.createElement('span', {
+        return React.createElement(TAG_NAME, {
             ref,
             children:
                 mounted || !fallback

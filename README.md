@@ -22,6 +22,7 @@ yarn add @diplodoc/mdx-extension
   - Short form JSX fragments `<>...</>`
   - Direct React component usage `<Component />`
   - Built-in security with MDX input validation
+  - Portal support for advanced component mounting with `withPortal`
 
 ## Usage
 
@@ -67,7 +68,7 @@ This will:
 ### Client-side Rendering (CSR)
 
 ```tsx
-import React, {useMemo, useRef} from 'react';
+import React, {Fragment, useMemo, useRef} from 'react';
 import transform from '@diplodoc/transform';
 import DefaultPlugins from '@diplodoc/transform/lib/plugins';
 import {mdxPlugin, useMdx, isWithMdxArtifacts, validateMdx} from '@diplodoc/mdx-extension';
@@ -106,14 +107,19 @@ function App() {
     return result;
   }, []);
 
-  useMdx({
+  const portals = useMdx({
     refCtr: ref,
     html,
     components: Components,
     mdxArtifacts,
   });
 
-  return <div ref={ref}></div>;
+  return (
+    <Fragment>
+      <div ref={ref}></div>
+      {portals}
+    </Fragment>
+  );
 }
 ```
 
@@ -157,7 +163,7 @@ export async function getServerSideProps() {
 function ServerPage({html, mdxArtifacts}) {
   const ref = useRef(null);
 
-  useMdxSsr({
+  const portals = useMdxSsr({
     refCtr: ref,
     components: Components,
     mdxArtifacts,
@@ -168,7 +174,12 @@ function ServerPage({html, mdxArtifacts}) {
     return {__html: html};
   }, [html]);
 
-  return <div ref={ref} dangerouslySetInnerHTML={innerHtml}></div>;
+  return (
+    <Fragment>
+      <div ref={ref} dangerouslySetInnerHTML={innerHtml}></div>
+      {portals}
+    </Fragment>
+  );
 }
 ```
 
@@ -219,7 +230,7 @@ The main plugin function that enables MDX processing.
 - `render`: Optional renderer function, for SSR use `getSsrRenderer`
 - `tagNames?: string[]` - Optional array of tag names to filter which components will be processed
 
-### `useMdx(options: UseMdxProps)`
+### `useMdx(options: UseMdxProps): React.Fragment`
 
 React hook for client-side MDX processing.
 
@@ -231,7 +242,7 @@ React hook for client-side MDX processing.
 - `mdxArtifacts`: MDX artifacts from transform
 - `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
 
-### `useMdxSsr(options: UseMdxSsrProps)`
+### `useMdxSsr(options: UseMdxSsrProps): React.Fragment`
 
 React hook for SSR-processed MDX content.
 
@@ -321,6 +332,29 @@ Wraps a component to enable initial props fetching during SSR.
 
 - `component`: React component to wrap
 - `getInitProps`: Function that receives props and MDX state, returns props (sync or async)
+
+#### `withPortal: WithPortalProps`
+
+Wraps a component to render it through React.createPortal, allowing for more flexible mounting.
+
+**Parameters:**
+
+- `component`: React component to wrap
+- `fallback`: Optional fallback component to show before portal is mounted
+
+**Usage:**
+
+```tsx
+export const COMPONENTS = {
+  Tabs: withPortal(TabsLocal, () => <Skeleton />),
+};
+```
+
+When using `withPortal`, the component will:
+
+1. Render the fallback component (if provided) initially
+2. Create a portal to mount the actual component when ready
+3. Clean up the portal when unmounted
 
 ## Syntax Examples
 

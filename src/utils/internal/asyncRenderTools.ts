@@ -17,10 +17,6 @@ const getInitPropsFn = <C extends React.ComponentType, T = React.ComponentProps<
         | undefined;
 };
 
-export function generateUniqueId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substring(2);
-}
-
 type JSXFnParameters = Parameters<typeof runtime.jsx>;
 
 export class AsyncComponentWrapper {

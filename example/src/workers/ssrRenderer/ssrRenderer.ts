@@ -37,7 +37,7 @@ const getContent = async (content: string) => {
     for (let i = 0, id; (id = keys[i]); i++) {
         const code = mdxArtifacts.idMdx[id];
 
-        const result = await swcTransform(code, {
+        const swcResult = await swcTransform(code, {
             jsc: {
                 parser: {
                     syntax: 'ecmascript',
@@ -52,7 +52,7 @@ const getContent = async (content: string) => {
             minify: true,
         });
 
-        mdxArtifacts.idMdx[id] = result.code;
+        mdxArtifacts.idMdx[id] = swcResult.code;
     }
 
     return {html: htmlWithMdx, mdxArtifacts};

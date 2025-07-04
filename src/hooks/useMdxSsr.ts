@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import type {MdxArtifacts} from '../types';
 import {idMdxToComponents, renderMdxComponents} from '../utils/internal/common';
 import type {MDXComponents} from 'mdx/types';
+import usePortals from './usePortals';
 
 export interface UseMdxSsrProps {
     html: string;
@@ -12,7 +13,9 @@ export interface UseMdxSsrProps {
 }
 
 const useMdxSsr = ({html, refCtr, mdxArtifacts, components, pureComponents}: UseMdxSsrProps) => {
-    const refUmount = React.useRef(() => {});
+    const refUmount = useRef(() => {});
+
+    const {portalsNode, setPortal} = usePortals();
 
     const combinedComponents = React.useMemo(
         () => ({...components, ...pureComponents}),
@@ -42,8 +45,11 @@ const useMdxSsr = ({html, refCtr, mdxArtifacts, components, pureComponents}: Use
             ctr,
             components: combinedComponents,
             isSSR: true,
+            setPortal,
         });
-    }, [html, refCtr, combinedComponents, idMdxComponent]);
+    }, [html, refCtr, combinedComponents, idMdxComponent, setPortal]);
+
+    return portalsNode;
 };
 
 export default useMdxSsr;

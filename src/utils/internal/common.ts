@@ -3,7 +3,7 @@ import {type Root, createRoot, hydrateRoot} from 'react-dom/client';
 import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import type {MDXComponents, MDXProps} from 'mdx/types';
-import {MdxStateCtx} from '../../context';
+import {type MdxPortalCtxSetterProps, MdxPortalSetterCtx, MdxStateCtx} from '../../context';
 
 const nodeRootMap = new WeakMap<Element, Root>();
 const nodeWillUmount = new WeakMap<Element, boolean>();
@@ -13,6 +13,7 @@ interface RenderMdxComponentsProps {
     isSSR?: boolean;
     components?: MDXComponents;
     idMdxComponent: Record<string, React.ComponentType<MDXProps>>;
+    setPortal: (props: MdxPortalCtxSetterProps) => void;
 }
 
 export const renderMdxComponents = ({
@@ -20,6 +21,7 @@ export const renderMdxComponents = ({
     isSSR,
     ctr,
     components,
+    setPortal,
 }: RenderMdxComponentsProps) => {
     const unmountFns = Object.entries(idMdxComponent).map(([id, Content]) => {
         let node = ctr.querySelector<HTMLElement>(`.${id}`);
@@ -35,10 +37,13 @@ export const renderMdxComponents = ({
 
         const mdxState = node?.dataset?.mdxState ? JSON.parse(node.dataset.mdxState) : null;
 
-        const reactNode = React.createElement(MdxStateCtx.Provider, {
-            value: mdxState,
-            children: React.createElement(Content, {
-                components,
+        const reactNode = React.createElement(MdxPortalSetterCtx.Provider, {
+            value: setPortal,
+            children: React.createElement(MdxStateCtx.Provider, {
+                value: mdxState,
+                children: React.createElement(Content, {
+                    components,
+                }),
             }),
         });
 
@@ -106,4 +111,8 @@ export function isEmptyObject(obj: Object) {
         return false;
     }
     return true;
+}
+
+export function generateUniqueId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }

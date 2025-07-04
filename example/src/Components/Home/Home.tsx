@@ -1,5 +1,5 @@
 'use client';
-import React, {FC, useRef} from 'react';
+import React, {FC, Fragment, useRef} from 'react';
 import '@diplodoc/transform/dist/css/yfm.css';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {MdxArtifacts, useMdxSsr} from '@plugin';
@@ -13,7 +13,7 @@ interface HomeProps {
 const Home: FC<HomeProps> = ({html, mdxArtifacts}) => {
     const refYfm = useRef<HTMLDivElement>(null);
 
-    useMdxSsr({
+    const portalsNode = useMdxSsr({
         refCtr: refYfm,
         components: COMPONENTS,
         pureComponents: PURE_COMPONENTS,
@@ -25,7 +25,12 @@ const Home: FC<HomeProps> = ({html, mdxArtifacts}) => {
         return {__html: html};
     }, [html]);
 
-    return <div ref={refYfm} className={'yfm'} dangerouslySetInnerHTML={innerHtml} />;
+    return (
+        <Fragment>
+            <div ref={refYfm} className={'yfm'} dangerouslySetInnerHTML={innerHtml} />
+            {portalsNode}
+        </Fragment>
+    );
 };
 
 export default Home;

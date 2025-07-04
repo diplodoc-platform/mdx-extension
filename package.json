@@ -1,6 +1,6 @@
 {
   "name": "@diplodoc/mdx-extension",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "scripts": {
     "prepare": "husky",
     "lint:js": "eslint --ext .js,.jsx,.ts,.tsx .",

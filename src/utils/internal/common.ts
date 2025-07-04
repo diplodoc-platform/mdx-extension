@@ -3,8 +3,11 @@ import {type Root, createRoot, hydrateRoot} from 'react-dom/client';
 import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import type {MDXComponents, MDXProps} from 'mdx/types';
-import {type MdxPortalCtxSetterProps, MdxPortalSetterCtx, MdxStateCtx} from '../../context';
-import {MdxPortalInnerCtx} from '../../context/MdxPortalInnerCtx';
+import {MdxStateCtx} from '../../context';
+import {
+    type MdxPortalCtxSetterProps,
+    MdxPortalSetterCtx,
+} from '../../context/internal/MdxPortalSetterCtx';
 
 const nodeRootMap = new WeakMap<Element, Root>();
 const nodeWillUmount = new WeakMap<Element, boolean>();
@@ -59,10 +62,7 @@ export const renderMdxComponents = ({
             setPortal({
                 id,
                 node,
-                reactNode: React.createElement(MdxPortalInnerCtx.Provider, {
-                    value: true,
-                    children: reactNode,
-                }),
+                reactNode,
             });
         } else {
             root = nodeRootMap.get(node);

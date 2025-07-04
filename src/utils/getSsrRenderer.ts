@@ -5,7 +5,8 @@ import React from 'react';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
 import {escapeAttribute, isEmptyObject, wrapObject} from './internal/common';
-import {MdxPortalSetterCtx, MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
+import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
+import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import type {GetHtmlProps} from './internal/types';
 
 export interface GetSsrRendererProps {

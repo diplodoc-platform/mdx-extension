@@ -8,9 +8,8 @@ import React, {
     useState,
 } from 'react';
 import {componentPortalSet, generateUniqueId} from './internal/common';
-import {MdxPortalSetterCtx} from '../context';
+import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import {TAG_NAME} from '../constants';
-import {MdxPortalInnerCtx} from '../context/MdxPortalInnerCtx';
 
 const withPortal = <A = {}, T = React.ComponentType<A>>(component: T, fallback?: T) => {
     const wrappedComponent = portalSwitch(component, fallback);
@@ -22,10 +21,10 @@ export default withPortal;
 
 function portalSwitch<A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A> {
     return (props) => {
-        const insidePortal = useContext(MdxPortalInnerCtx);
         const portalSetter = useContext(MdxPortalSetterCtx);
 
-        if (insidePortal || !portalSetter) {
+        if (!portalSetter) {
+            // inside portal
             return React.createElement(component as React.ComponentType, props as {});
         }
 

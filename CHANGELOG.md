@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.2](https://github.com/diplodoc-platform/mdx-extension/compare/v1.5.1...v1.5.2) (2025-07-04)
+
+
+### Bug Fixes
+
+* **withPortal:** fix render ([#43](https://github.com/diplodoc-platform/mdx-extension/issues/43)) ([23a061e](https://github.com/diplodoc-platform/mdx-extension/commit/23a061e6dba043700dd8b68e482b750ddab727be))
+
 ## [1.5.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.5.0...v1.5.1) (2025-07-04)
 
 

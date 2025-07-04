@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.4.2...v1.5.0) (2025-07-04)
+
+
+### Features
+
+* **withPortal:** add components via portal ([#39](https://github.com/diplodoc-platform/mdx-extension/issues/39)) ([c263e78](https://github.com/diplodoc-platform/mdx-extension/commit/c263e78f8e671855ff228259917e92539ad025b1))
+
 ## [1.4.2](https://github.com/diplodoc-platform/mdx-extension/compare/v1.4.1...v1.4.2) (2025-07-03)
 
 

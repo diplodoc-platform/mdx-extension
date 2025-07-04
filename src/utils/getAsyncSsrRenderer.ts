@@ -41,10 +41,7 @@ const getAsyncSsrRenderer = ({
                 ...components,
                 ...pureComponents,
             },
-            (name, _component) => {
-                usedComponents.add(name);
-                // return getPortalFallback(component as React.ComponentType);
-            },
+            (name) => usedComponents.add(name),
         );
 
         const asyncWrapper = componentFn({

@@ -83,13 +83,13 @@ export const idMdxToComponents = (idMdx?: Record<string, string>) => {
     );
 };
 
-export function wrapObject<T extends Object>(
-    obj: T,
-    onGet: (name: string, component: T[keyof T]) => T[keyof T] | void,
-) {
+export function wrapObject<T extends Object>(obj: T, onGet: (name: string) => void) {
     return Object.entries(obj).reduce<T>((acc, [key, value]) => {
         Object.defineProperty(acc, key, {
-            get: () => onGet(key, value) ?? value,
+            get: () => {
+                onGet(key);
+                return value;
+            },
             enumerable: true,
         });
         return acc;

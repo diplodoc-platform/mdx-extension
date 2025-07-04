@@ -14,12 +14,13 @@ export const getMdxCollectPlugin = (options: GetMdxCollectPluginOptions) => {
     const render = getSsrRenderer(rendererOptions);
 
     const plugin = (origContent: string) => {
-        const mdxArtifacts: MdxArtifacts = {idMdx: {}};
+        const mdxArtifacts: MdxArtifacts = {idMdx: {}, idTagName: {}};
 
         const content = replaceBlocks({
             content: origContent,
             tagNames,
-            replacer: ({content: contentLocal}) => render(contentLocal, mdxArtifacts),
+            replacer: ({content: contentLocal, tagName}) =>
+                render({mdx: contentLocal, mdxArtifacts, tagName}),
         });
 
         return content;
@@ -39,12 +40,13 @@ export const getAsyncMdxCollectPlugin = (options: GetAsyncMdxCollectPluginOption
     const {render, renderAsync} = getAsyncSsrRenderer(rendererOptions);
 
     const plugin = async (origContent: string) => {
-        const mdxArtifacts: MdxArtifacts = {idMdx: {}};
+        const mdxArtifacts: MdxArtifacts = {idMdx: {}, idTagName: {}};
 
         let content = replaceBlocks({
             content: origContent,
             tagNames,
-            replacer: ({content: contentLocal}) => render(contentLocal),
+            replacer: ({content: contentLocal, tagName}) =>
+                render({mdx: contentLocal, mdxArtifacts, tagName}),
         });
 
         content = await renderAsync(content, mdxArtifacts);

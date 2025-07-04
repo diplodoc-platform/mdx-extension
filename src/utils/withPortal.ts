@@ -7,20 +7,32 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import {generateUniqueId} from './internal/common';
-import {MdxPortalSetterCtx} from '../context';
+import {componentPortalSet, generateUniqueId} from './internal/common';
+import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
+import {TAG_NAME} from '../constants';
 
-export interface WithPortalProps {
-    <A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A>;
-}
-
-const withPortal: WithPortalProps = (component, fallback) => {
-    return portalCtrWrapper(component, fallback);
+const withPortal = <A = {}, T = React.ComponentType<A>>(component: T, fallback?: T) => {
+    const wrappedComponent = portalSwitch(component, fallback);
+    componentPortalSet.add(wrappedComponent);
+    return wrappedComponent as FC<A>;
 };
 
 export default withPortal;
 
-function portalCtrWrapper<A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A> {
+function portalSwitch<A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A> {
+    return (props) => {
+        const portalSetter = useContext(MdxPortalSetterCtx);
+
+        if (!portalSetter) {
+            // inside portal
+            return React.createElement(component as React.ComponentType, props as {});
+        }
+
+        return React.createElement(portalWrapper(component, fallback), props as {});
+    };
+}
+
+function portalWrapper<A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A> {
     return (props) => {
         const portalSetter = useContext(MdxPortalSetterCtx);
         const ref = useRef<HTMLSpanElement>();
@@ -29,6 +41,7 @@ function portalCtrWrapper<A = {}, T = React.ComponentType<A>>(component: T, fall
 
         useEffect(() => {
             return () => {
+                if (!portalSetter) return;
                 portalSetter({
                     id,
                     node: null,
@@ -39,7 +52,7 @@ function portalCtrWrapper<A = {}, T = React.ComponentType<A>>(component: T, fall
 
         useLayoutEffect(() => {
             const node = ref.current;
-            if (!node) return;
+            if (!node || !portalSetter) return;
             setMounted(true);
 
             portalSetter({
@@ -49,7 +62,7 @@ function portalCtrWrapper<A = {}, T = React.ComponentType<A>>(component: T, fall
             });
         }, [id, component, props]);
 
-        return React.createElement('span', {
+        return React.createElement(TAG_NAME, {
             ref,
             children:
                 mounted || !fallback

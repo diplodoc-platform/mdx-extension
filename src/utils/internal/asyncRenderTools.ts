@@ -1,6 +1,7 @@
 import React from 'react';
 import type {MdxStateCtxValue} from '../../context';
 import * as runtime from 'react/jsx-runtime';
+import {portalWrapperComponentMap} from './common';
 
 export const componentGetInitProps = new WeakMap<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,9 +13,11 @@ export const componentGetInitProps = new WeakMap<
 const getInitPropsFn = <C extends React.ComponentType, T = React.ComponentProps<C>>(
     component: React.ComponentType,
 ) => {
-    return componentGetInitProps.get(component) as
-        | ((props: Object, mdxState: MdxStateCtxValue) => Promise<T> | T)
-        | undefined;
+    const origComponent = portalWrapperComponentMap.get(component);
+    const initFn =
+        componentGetInitProps.get(component) ??
+        (origComponent && componentGetInitProps.get(origComponent));
+    return initFn as ((props: Object, mdxState: MdxStateCtxValue) => Promise<T> | T) | undefined;
 };
 
 type JSXFnParameters = Parameters<typeof runtime.jsx>;

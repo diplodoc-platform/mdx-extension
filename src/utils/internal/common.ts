@@ -147,8 +147,8 @@ export function generateUniqueId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
 
-export const componentPortalSet = new Set<React.ComponentType>();
+export const portalWrapperComponentMap = new WeakMap<React.ComponentType, React.ComponentType>();
 
 export function isPortal(component: React.ComponentType) {
-    return componentPortalSet.has(component);
+    return portalWrapperComponentMap.has(component);
 }

@@ -1,12 +1,12 @@
 import React, {type FC, useContext, useEffect, useMemo, useRef, useState} from 'react';
-import {componentPortalSet, generateUniqueId} from './internal/common';
+import {generateUniqueId, portalWrapperComponentMap} from './internal/common';
 import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import {TAG_NAME} from '../constants';
 import {useLocalLayoutEffect} from '../hooks/internal/useLocalLayoutEffect';
 
 const withPortal = <A = {}, T = React.ComponentType<A>>(component: T, fallback?: T) => {
     const wrappedComponent = portalSwitch(component, fallback);
-    componentPortalSet.add(wrappedComponent);
+    portalWrapperComponentMap.set(wrappedComponent, component as React.ComponentType);
     return wrappedComponent as FC<A>;
 };
 

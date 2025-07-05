@@ -1,14 +1,7 @@
 import React from 'react';
 import type {MdxStateCtxValue} from '../../context';
 import * as runtime from 'react/jsx-runtime';
-import {portalWrapperComponentMap} from './common';
-
-export const componentGetInitProps = new WeakMap<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    React.ComponentType<any>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (...args: any[]) => Promise<unknown> | unknown
->();
+import {componentGetInitProps, portalWrapperComponentMap} from './maps';
 
 const getInitPropsFn = <C extends React.ComponentType, T = React.ComponentProps<C>>(
     component: React.ComponentType,

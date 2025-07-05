@@ -4,10 +4,17 @@ import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {escapeAttribute, isEmptyObject, wrapObject} from './internal/common';
+import {isPortal} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import type {GetHtmlProps} from './internal/types';
+import {
+    escapeAttribute,
+    isEmptyObject,
+    trimComponentWrapper,
+    trimPortalTag,
+    wrapObject,
+} from './internal/ssr';
 
 export interface GetSsrRendererProps {
     components?: MDXComponents;
@@ -18,21 +25,23 @@ export interface GetSsrRendererProps {
 const getSsrRenderer = ({components, pureComponents, compileOptions}: GetSsrRendererProps) => {
     const componentsNames = Object.keys(components || {});
     const usedComponents = new Set<string>();
-    const combinedComponents = wrapObject(
-        {
-            ...components,
-            ...pureComponents,
-        },
-        (name) => usedComponents.add(name),
+    const combinedComponents = {
+        ...components,
+        ...pureComponents,
+    };
+    const combinedComponentsWatch = wrapObject(combinedComponents, (name) =>
+        usedComponents.add(name),
     );
 
-    const render = (id: string, mdx: string) => {
+    const render = (id: string, mdx: string, tagName: string) => {
         const vFile = compileSync(mdx, {
             ...compileOptions,
             outputFormat: 'function-body',
         });
 
         const {default: Component} = runSync(vFile, runtime);
+
+        const isTopLevelPortal = isPortal(combinedComponents[tagName] as React.ComponentType);
 
         let code: string | undefined = vFile.toString();
 
@@ -56,7 +65,7 @@ const getSsrRenderer = ({components, pureComponents, compileOptions}: GetSsrRend
                         children: React.createElement(MdxStateCtx.Provider, {
                             value: state,
                             children: React.createElement(Component, {
-                                components: combinedComponents,
+                                components: combinedComponentsWatch,
                             }),
                         }),
                     }),
@@ -72,10 +81,12 @@ const getSsrRenderer = ({components, pureComponents, compileOptions}: GetSsrRend
         }
         const withComponents = componentsNames.some((name) => usedComponents.has(name));
         if (!withComponents) {
-            const endOpenSpan = html.indexOf('>');
-            const startCloseSpan = html.lastIndexOf('<');
-            html = html.slice(endOpenSpan + 1, startCloseSpan);
+            html = trimComponentWrapper(html);
             code = undefined;
+        }
+
+        if (isTopLevelPortal) {
+            html = trimPortalTag(html);
         }
 
         return {html, code};
@@ -86,7 +97,7 @@ const getSsrRenderer = ({components, pureComponents, compileOptions}: GetSsrRend
     const getHtml = ({mdx, mdxArtifacts, tagName}: GetHtmlProps) => {
         const {idMdx, idTagName} = mdxArtifacts;
         const id = `${MDX_PREFIX}${++idx}`;
-        const {html, code} = render(id, mdx);
+        const {html, code} = render(id, mdx, tagName);
         if (code) {
             idMdx[id] = code;
             idTagName[id] = tagName;

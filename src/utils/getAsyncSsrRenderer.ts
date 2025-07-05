@@ -4,11 +4,18 @@ import React from 'react';
 import type {MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {escapeAttribute, generateUniqueId, isEmptyObject, wrapObject} from './internal/common';
+import {generateUniqueId, isPortal} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import {AsyncComponentWrapper, getMdxRuntimeWithHook} from './internal/asyncRenderTools';
 import type {GetHtmlProps} from './internal/types';
+import {
+    escapeAttribute,
+    isEmptyObject,
+    trimComponentWrapper,
+    trimPortalTag,
+    wrapObject,
+} from './internal/ssr';
 
 export interface GetAsyncSsrRendererProps {
     components?: MDXComponents;
@@ -27,7 +34,7 @@ const getAsyncSsrRenderer = ({
         ...pureComponents,
     };
 
-    const render = async (id: string, mdx: string) => {
+    const render = async (id: string, mdx: string, tagName: string) => {
         const vFile = await compile(mdx, {
             ...compileOptions,
             outputFormat: 'function-body',
@@ -40,6 +47,8 @@ const getAsyncSsrRenderer = ({
 
         const {runtime, init} = getMdxRuntimeWithHook();
         const {default: componentFn} = await run(vFile, runtime as unknown as RunOptions);
+
+        const isTopLevelPortal = isPortal(combinedComponents[tagName] as React.ComponentType);
 
         const usedComponents = new Set<string>();
         const combinedComponentsWatch = wrapObject(combinedComponents, (name) =>
@@ -83,10 +92,12 @@ const getAsyncSsrRenderer = ({
         }
         const withComponents = componentsNames.some((name) => usedComponents.has(name));
         if (!withComponents) {
-            const endOpenSpan = html.indexOf('>');
-            const startCloseSpan = html.lastIndexOf('<');
-            html = html.slice(endOpenSpan + 1, startCloseSpan);
+            html = trimComponentWrapper(html);
             code = undefined;
+        }
+
+        if (isTopLevelPortal) {
+            html = trimPortalTag(html);
         }
 
         return {html, code};
@@ -101,7 +112,7 @@ const getAsyncSsrRenderer = ({
         const items: {id: string; replacer: string; tagName: string}[] = [];
         const promises: ReturnType<typeof render>[] = [];
         idFragment.forEach(({replacer, mdx, tagName}, id) => {
-            promises.push(render(id, mdx));
+            promises.push(render(id, mdx, tagName));
             items.push({id, replacer, tagName});
         });
         const promiseResults = await Promise.all(promises);

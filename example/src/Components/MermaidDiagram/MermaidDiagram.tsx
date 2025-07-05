@@ -1,4 +1,4 @@
-import React, {FC, useLayoutEffect, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import mermaid from 'mermaid';
 import {Skeleton} from '@gravity-ui/uikit';
 import './MermaidDiagram.scss';
@@ -11,7 +11,7 @@ interface MermaidDiagramProps {
 const MermaidDiagram: FC<MermaidDiagramProps> = ({children, skeletonHeight = 10}) => {
     const [svg, setSvg] = useState('');
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         (async () => {
             try {
                 // Инициализируем Mermaid

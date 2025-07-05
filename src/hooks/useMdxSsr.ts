@@ -1,8 +1,8 @@
-import React, {useRef} from 'react';
+import React, {useLayoutEffect, useMemo, useRef} from 'react';
 import type {MdxArtifacts} from '../types';
 import {idMdxToComponents, renderMdxComponents} from '../utils/internal/common';
 import type {MDXComponents} from 'mdx/types';
-import usePortals from './usePortals';
+import usePortals from './internal/usePortals';
 
 export interface UseMdxSsrProps {
     html: string;
@@ -17,26 +17,26 @@ const useMdxSsr = ({html, refCtr, mdxArtifacts, components, pureComponents}: Use
 
     const {portalsNode, setPortal} = usePortals();
 
-    const combinedComponents = React.useMemo(
+    const combinedComponents = useMemo(
         () => ({...components, ...pureComponents}),
         [components, pureComponents],
     );
 
     // building mdx scripts into components
-    const idMdxComponent = React.useMemo(
+    const idMdxComponent = useMemo(
         () => idMdxToComponents(mdxArtifacts?.idMdx),
         [mdxArtifacts?.idMdx],
     );
 
-    const idTagName = React.useMemo(() => mdxArtifacts?.idTagName ?? {}, [mdxArtifacts]);
+    const idTagName = useMemo(() => mdxArtifacts?.idTagName ?? {}, [mdxArtifacts]);
 
     // umount mdx components when html or refCtr changes
-    React.useLayoutEffect(() => {
+    useLayoutEffect(() => {
         return () => refUmount.current();
     }, [html, refCtr]);
 
     // render mdx
-    React.useLayoutEffect(() => {
+    useLayoutEffect(() => {
         const ctr = refCtr.current;
         if (!ctr) {
             throw new Error('ctr is null');

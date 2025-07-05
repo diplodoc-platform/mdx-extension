@@ -127,6 +127,11 @@ export function replaceBlocks(options: ReplaceBlocksOptions) {
         }
 
         if (isSelfClosed) {
+            if (isMdx) {
+                pos = openBracketPos + 1;
+                continue;
+            }
+
             // Заменяем на placeholder
             const placeholder = replacer({content: openTag, fragment: openTag, tagName});
             processedText =
@@ -158,7 +163,7 @@ export function replaceBlocks(options: ReplaceBlocksOptions) {
         const content = isMdx ? processedText.slice(openTagEnd, closeTagStart) : fragment;
 
         // Заменяем весь тег на placeholder
-        const placeholder = replacer({content, fragment, tagName});
+        const placeholder = replacer({content, fragment, tagName: isMdx ? 'Fragment' : tagName});
         processedText =
             processedText.slice(0, openBracketPos) + placeholder + processedText.slice(closeTagEnd);
 

@@ -55,7 +55,9 @@ export const renderMdxComponents = ({
 
         let root: Root | undefined;
         if (isTopLevelPortal) {
-            node.textContent = '';
+            while (node.firstChild) {
+                node.removeChild(node.firstChild);
+            }
             setPortal({
                 id,
                 node,

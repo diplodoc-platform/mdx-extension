@@ -8,6 +8,7 @@ import {
     type MdxPortalCtxSetterProps,
     MdxPortalSetterCtx,
 } from '../../context/internal/MdxPortalSetterCtx';
+import {portalWrapperComponentMap} from './maps';
 
 const nodeRootMap = new WeakMap<Element, Root>();
 const nodeWillUmount = new WeakMap<Element, boolean>();
@@ -113,41 +114,9 @@ export const idMdxToComponents = (idMdx?: Record<string, string>) => {
     );
 };
 
-export function wrapObject<T extends Object>(obj: T, onGet: (name: string) => void) {
-    return Object.entries(obj).reduce<T>((acc, [key, value]) => {
-        Object.defineProperty(acc, key, {
-            get: () => {
-                onGet(key);
-                return value;
-            },
-            enumerable: true,
-        });
-        return acc;
-    }, {} as T);
-}
-
-export function escapeAttribute(value: unknown) {
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-}
-
-export function isEmptyObject(obj: Object) {
-    // eslint-disable-next-line guard-for-in
-    for (const _key in obj) {
-        return false;
-    }
-    return true;
-}
-
 export function generateUniqueId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
-
-export const portalWrapperComponentMap = new WeakMap<React.ComponentType, React.ComponentType>();
 
 export function isPortal(component: React.ComponentType) {
     return portalWrapperComponentMap.has(component);

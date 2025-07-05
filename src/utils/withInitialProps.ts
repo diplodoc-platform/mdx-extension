@@ -1,6 +1,6 @@
 import React from 'react';
-import {componentGetInitProps} from './internal/asyncRenderTools';
 import type {MDXGetInitialProps} from '../types';
+import {componentGetInitProps} from './internal/maps';
 
 export interface WithInitialProps {
     <A = {}, T = React.ComponentType<A>>(

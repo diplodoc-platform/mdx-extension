@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo, useRef, useState} from 'react';
-import type {MdxPortalCtxSetterProps} from '../context/internal/MdxPortalSetterCtx';
+import type {MdxPortalCtxSetterProps} from '../../context/internal/MdxPortalSetterCtx';
 import {createPortal} from 'react-dom';
 
 const usePortals = () => {

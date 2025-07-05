@@ -1,15 +1,8 @@
-import React, {
-    type FC,
-    useContext,
-    useEffect,
-    useLayoutEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import React, {type FC, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {componentPortalSet, generateUniqueId} from './internal/common';
 import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import {TAG_NAME} from '../constants';
+import {useLocalLayoutEffect} from '../hooks/internal/useLocalLayoutEffect';
 
 const withPortal = <A = {}, T = React.ComponentType<A>>(component: T, fallback?: T) => {
     const wrappedComponent = portalSwitch(component, fallback);
@@ -50,7 +43,7 @@ function portalWrapper<A = {}, T = React.ComponentType<A>>(component: T, fallbac
             };
         }, [id]);
 
-        useLayoutEffect(() => {
+        useLocalLayoutEffect(() => {
             const node = ref.current;
             if (!node || !portalSetter) return;
             setMounted(true);

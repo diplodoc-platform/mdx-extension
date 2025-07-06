@@ -9,9 +9,11 @@ import {
     MdxPortalSetterCtx,
 } from '../../context/internal/MdxPortalSetterCtx';
 import {portalWrapperComponentMap} from './maps';
+import type {MdxArtifacts} from '../../types';
 
 const nodeRootMap = new WeakMap<Element, Root>();
 const nodeWillUmount = new WeakMap<Element, boolean>();
+const nodePortalCleanup = new WeakMap<Element, boolean>();
 
 interface RenderMdxComponentsProps {
     ctr: HTMLElement;
@@ -56,8 +58,11 @@ export const renderMdxComponents = ({
 
         let root: Root | undefined;
         if (isTopLevelPortal) {
-            while (node.firstChild) {
-                node.removeChild(node.firstChild);
+            if (!nodePortalCleanup.has(node)) {
+                nodePortalCleanup.set(node, true);
+                while (node.firstChild) {
+                    node.removeChild(node.firstChild);
+                }
             }
             setPortal({
                 id,
@@ -120,4 +125,8 @@ export function generateUniqueId(): string {
 
 export function isPortal(component: React.ComponentType) {
     return portalWrapperComponentMap.has(component);
+}
+
+export function getInitMdxArtifacts(): MdxArtifacts {
+    return {idMdx: {}, idTagName: {}};
 }

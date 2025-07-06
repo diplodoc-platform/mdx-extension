@@ -4,7 +4,7 @@ import React from 'react';
 import type {MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {generateUniqueId, isPortal} from './internal/common';
+import {generateUniqueId, getInitMdxArtifacts, isPortal} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import {AsyncComponentWrapper, getMdxRuntimeWithHook} from './internal/asyncRenderTools';
@@ -105,9 +105,9 @@ const getAsyncSsrRenderer = ({
 
     const idFragment = new Map<string, {replacer: string; mdx: string; tagName: string}>();
 
-    const getHtmlAsync = async (inputOrig: string, mdxArtifacts: MdxArtifacts) => {
+    const getHtmlAsync = async (inputOrig: string, mdxArtifacts?: MdxArtifacts) => {
         let input = inputOrig;
-        const {idMdx, idTagName} = mdxArtifacts;
+        const {idMdx, idTagName} = mdxArtifacts ?? getInitMdxArtifacts();
 
         const items: {id: string; replacer: string; tagName: string}[] = [];
         const promises: ReturnType<typeof render>[] = [];

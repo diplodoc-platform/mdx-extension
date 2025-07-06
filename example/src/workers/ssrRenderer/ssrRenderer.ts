@@ -6,7 +6,6 @@ import DefaultPlugins from '@diplodoc/transform/lib/plugins';
 import {isWithMdxArtifacts, mdxPlugin} from '@plugin';
 import {PURE_COMPONENTS, SSR_COMPONENTS} from '@/components';
 import getAsyncSsrRenderer from '../../../../src/utils/getAsyncSsrRenderer';
-import assert from 'node:assert';
 import {transform as swcTransform} from '@swc/core';
 
 export interface SsrRendererWorker {
@@ -29,30 +28,31 @@ const getContent = async (content: string) => {
 
     const {html, mdxArtifacts} = result;
 
-    assert(mdxArtifacts);
     const htmlWithMdx = await renderAsync(html, mdxArtifacts);
 
-    const keys = Object.keys(mdxArtifacts.idMdx);
+    if (mdxArtifacts) {
+        const keys = Object.keys(mdxArtifacts.idMdx);
 
-    for (let i = 0, id; (id = keys[i]); i++) {
-        const code = mdxArtifacts.idMdx[id];
+        for (let i = 0, id; (id = keys[i]); i++) {
+            const code = mdxArtifacts.idMdx[id];
 
-        const swcResult = await swcTransform(code, {
-            jsc: {
-                parser: {
-                    syntax: 'ecmascript',
-                    allowReturnOutsideFunction: true,
-                },
-                minify: {
-                    mangle: {
-                        topLevel: true,
+            const swcResult = await swcTransform(code, {
+                jsc: {
+                    parser: {
+                        syntax: 'ecmascript',
+                        allowReturnOutsideFunction: true,
+                    },
+                    minify: {
+                        mangle: {
+                            topLevel: true,
+                        },
                     },
                 },
-            },
-            minify: true,
-        });
+                minify: true,
+            });
 
-        mdxArtifacts.idMdx[id] = swcResult.code;
+            mdxArtifacts.idMdx[id] = swcResult.code;
+        }
     }
 
     return {html: htmlWithMdx, mdxArtifacts};

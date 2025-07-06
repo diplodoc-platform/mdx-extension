@@ -9,8 +9,8 @@ interface GetRenderProps {
 const getRender = ({compileOptions}: GetRenderProps = {}) => {
     let idx = 0;
 
-    const getHtml = ({mdx, mdxArtifacts}: GetHtmlProps) => {
-        const {idMdx} = mdxArtifacts;
+    const getHtml = ({mdx, mdxArtifacts, tagName}: GetHtmlProps) => {
+        const {idMdx, idTagName} = mdxArtifacts;
 
         const id = `${MDX_PREFIX}${++idx}`;
         const vFile = compileSync(mdx, {
@@ -19,6 +19,7 @@ const getRender = ({compileOptions}: GetRenderProps = {}) => {
         });
         const code = vFile.toString();
         idMdx[id] = code;
+        idTagName[id] = tagName;
         return `<${TAG_NAME} class="${id}"></${TAG_NAME}>`;
     };
 

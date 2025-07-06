@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.5.4](https://github.com/diplodoc-platform/mdx-extension/compare/v1.5.3...v1.5.4) (2025-07-06)
+
+
+### Bug Fixes
+
+* **withPortal:** add portal node cleanup map ([#50](https://github.com/diplodoc-platform/mdx-extension/issues/50)) ([cdf5ba8](https://github.com/diplodoc-platform/mdx-extension/commit/cdf5ba819458982cfa1bab3e157b21541ed208a4))
+* **withPortal:** add trimPortalTag for fallback ([#49](https://github.com/diplodoc-platform/mdx-extension/issues/49)) ([478380c](https://github.com/diplodoc-platform/mdx-extension/commit/478380c037682d6b689f9545527a62b65ef48f9a))
+* **withPortal:** fix with* order ([#47](https://github.com/diplodoc-platform/mdx-extension/issues/47)) ([b3b4878](https://github.com/diplodoc-platform/mdx-extension/commit/b3b4878ac453a06fd336f767b1fb9f916c57651d))
+
 ## [1.5.3](https://github.com/diplodoc-platform/mdx-extension/compare/v1.5.2...v1.5.3) (2025-07-05)
 
 

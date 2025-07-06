@@ -160,7 +160,10 @@ export function replaceBlocks(options: ReplaceBlocksOptions) {
 
         const fragment = processedText.slice(openBracketPos, closeTagEnd);
         // Извлекаем содержимое
-        const content = isMdx ? processedText.slice(openTagEnd, closeTagStart) : fragment;
+        const content =
+            isMdx || tagName === 'Fragment'
+                ? processedText.slice(openTagEnd, closeTagStart)
+                : fragment;
 
         // Заменяем весь тег на placeholder
         const placeholder = replacer({content, fragment, tagName: isMdx ? 'Fragment' : tagName});

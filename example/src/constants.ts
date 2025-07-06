@@ -1,1 +1,1 @@
-export const CONTENT = require('!raw-loader!./content.mdx').default;
+export {default as CONTENT} from "!raw-loader!./content.mdx";

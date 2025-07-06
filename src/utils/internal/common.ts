@@ -9,6 +9,7 @@ import {
     MdxPortalSetterCtx,
 } from '../../context/internal/MdxPortalSetterCtx';
 import {portalWrapperComponentMap} from './maps';
+import type {MdxArtifacts} from '../../types';
 
 const nodeRootMap = new WeakMap<Element, Root>();
 const nodeWillUmount = new WeakMap<Element, boolean>();
@@ -124,4 +125,8 @@ export function generateUniqueId(): string {
 
 export function isPortal(component: React.ComponentType) {
     return portalWrapperComponentMap.has(component);
+}
+
+export function getInitMdxArtifacts(): MdxArtifacts {
+    return {idMdx: {}, idTagName: {}};
 }

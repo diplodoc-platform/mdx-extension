@@ -3,6 +3,7 @@ import {type GetSsrRendererProps} from './utils/getSsrRenderer';
 import {getAsyncSsrRenderer, getSsrRenderer} from './utils';
 import type {MdxArtifacts} from './types';
 import type {GetAsyncSsrRendererProps} from './utils/getAsyncSsrRenderer';
+import {getInitMdxArtifacts} from './utils/internal/common';
 
 export interface GetMdxCollectPluginOptions extends Omit<GetSsrRendererProps, 'components'> {
     tagNames?: string[];
@@ -14,7 +15,7 @@ export const getMdxCollectPlugin = (options: GetMdxCollectPluginOptions) => {
     const render = getSsrRenderer(rendererOptions);
 
     const plugin = (origContent: string) => {
-        const mdxArtifacts: MdxArtifacts = {idMdx: {}, idTagName: {}};
+        const mdxArtifacts: MdxArtifacts = getInitMdxArtifacts();
 
         const content = replaceBlocks({
             content: origContent,
@@ -40,7 +41,7 @@ export const getAsyncMdxCollectPlugin = (options: GetAsyncMdxCollectPluginOption
     const {render, renderAsync} = getAsyncSsrRenderer(rendererOptions);
 
     const plugin = async (origContent: string) => {
-        const mdxArtifacts: MdxArtifacts = {idMdx: {}, idTagName: {}};
+        const mdxArtifacts: MdxArtifacts = getInitMdxArtifacts();
 
         let content = replaceBlocks({
             content: origContent,

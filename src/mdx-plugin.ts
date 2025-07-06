@@ -8,6 +8,7 @@ import type {Token} from 'markdown-it';
 import {replaceBlocks} from './utils/internal/plugin';
 import type {GetHtmlProps, MdxBody} from './utils/internal/types';
 import {InternalTagName} from './constants';
+import {getInitMdxArtifacts} from './utils/internal/common';
 
 interface Options {
     render?: (props: GetHtmlProps) => string;
@@ -76,10 +77,7 @@ const mdxPlugin = (options?: Options) => {
 
         const blockPlugin: RuleBlock = (state, startLine, endLine, silent) => {
             const {env} = state as {env: {mdxArtifacts?: MdxArtifacts}};
-            const mdxArtifacts = (env.mdxArtifacts = env.mdxArtifacts || {
-                idMdx: {},
-                idTagName: {},
-            });
+            const mdxArtifacts = (env.mdxArtifacts = env.mdxArtifacts ?? getInitMdxArtifacts());
 
             const start = state.bMarks[startLine] + state.tShift[startLine];
 
@@ -125,10 +123,7 @@ const mdxPlugin = (options?: Options) => {
 
         const inlinePlugin: RuleInline = (state, silent) => {
             const {env} = state as {env: {mdxArtifacts?: MdxArtifacts}};
-            const mdxArtifacts = (env.mdxArtifacts = env.mdxArtifacts || {
-                idMdx: {},
-                idTagName: {},
-            });
+            const mdxArtifacts = (env.mdxArtifacts = env.mdxArtifacts ?? getInitMdxArtifacts());
 
             const start = state.pos;
 

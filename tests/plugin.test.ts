@@ -88,7 +88,7 @@ describe('corePlugin', () => {
 
         expect(state.src).toMatch(placeholderRe);
         const id = state.src.match(placeholderRe)?.[1] || -1;
-        expect(idMdxBody[id].content).toBe('content');
+        expect(idMdxBody[id].content).toBe('<>content</>');
         expect(idMdxBody[id].fragment).toBe('<>content</>');
     });
 

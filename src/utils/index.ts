@@ -1,6 +1,6 @@
-export {default as getRender} from './getRender';
-export {default as getSsrRenderer} from './getSsrRenderer';
-export {default as getAsyncSsrRenderer} from './getAsyncSsrRenderer';
-export {default as withInitialProps} from './withInitialProps';
-export {default as withPortal} from './withPortal';
+export {default as getRender, type GetRenderProps} from './getRender';
+export {default as getSsrRenderer, type GetSsrRendererProps} from './getSsrRenderer';
+export {default as getAsyncSsrRenderer, type GetAsyncSsrRendererProps} from './getAsyncSsrRenderer';
+export {default as withInitialProps, type WithInitialProps} from './withInitialProps';
+export {default as withPortal, type WithPortal} from './withPortal';
 export * from './common';

@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "build": "npm run build-esm && npm run build-cjs",
     "build-esm": "tsc",
-    "build-cjs": "node ./esbuild.js",
+    "build-cjs": "node ./esbuild.js && tsc --emitDeclarationOnly --outDir ./build/cjs",
     "prepublishOnly": "npm run build && npm pkg delete engines",
     "test": "cd tests && npm ci && npm test"
   },
@@ -24,7 +24,7 @@
     "access": "public"
   },
   "main": "./build/cjs/index.js",
-  "types": "./build/esm/index.d.ts",
+  "types": "./build/cjs/index.d.ts",
   "module": "./build/esm/index.js",
   "type": "commonjs",
   "sideEffects": false,

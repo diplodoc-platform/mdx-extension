@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.5](https://github.com/diplodoc-platform/mdx-extension/compare/v1.5.4...v1.5.5) (2025-07-08)
+
+
+### Bug Fixes
+
+* **cjs:** esbuild ([#54](https://github.com/diplodoc-platform/mdx-extension/issues/54)) ([57aabf8](https://github.com/diplodoc-platform/mdx-extension/commit/57aabf8306f19ea557cf6a92688e22a2efd23f7c))
+
 ## [1.5.4](https://github.com/diplodoc-platform/mdx-extension/compare/v1.5.3...v1.5.4) (2025-07-06)
 
 

@@ -2,7 +2,7 @@ import {type CompileOptions, compileSync} from '@mdx-js/mdx';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import type {GetHtmlProps} from './internal/types';
 
-interface GetRenderProps {
+export interface GetRenderProps {
     compileOptions?: CompileOptions;
 }
 

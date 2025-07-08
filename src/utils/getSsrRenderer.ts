@@ -1,10 +1,10 @@
 import type {MDXComponents} from 'mdx/types';
-import {type CompileOptions, compileSync, runSync} from '@mdx-js/mdx';
+import {type CompileOptions, compileSync} from '@mdx-js/mdx';
 import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {isPortal} from './internal/common';
+import {isPortal, runSync} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import type {GetHtmlProps} from './internal/types';
@@ -39,11 +39,10 @@ const getSsrRenderer = ({components, pureComponents, compileOptions}: GetSsrRend
             outputFormat: 'function-body',
         });
 
-        const {default: Component} = runSync(vFile, runtime);
+        let code: string | undefined = vFile.toString();
+        const {default: Component} = runSync(code, runtime);
 
         const isTopLevelPortal = isPortal(combinedComponents[tagName] as React.ComponentType);
-
-        let code: string | undefined = vFile.toString();
 
         const state = {};
         const setState = (value: MdxStateCtxValue) => {

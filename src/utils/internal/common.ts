@@ -1,4 +1,3 @@
-import {runSync} from '@mdx-js/mdx';
 import {type Root, createRoot, hydrateRoot} from 'react-dom/client';
 import * as runtime from 'react/jsx-runtime';
 import React from 'react';
@@ -129,4 +128,10 @@ export function isPortal(component: React.ComponentType) {
 
 export function getInitMdxArtifacts(): MdxArtifacts {
     return {idMdx: {}, idTagName: {}};
+}
+
+// runSync from @mdx-js/mdx
+export function runSync(code: string, options: unknown) {
+    // eslint-disable-next-line no-new-func
+    return new Function(String(code))(options);
 }

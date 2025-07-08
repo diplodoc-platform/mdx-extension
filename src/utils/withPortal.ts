@@ -5,10 +5,14 @@ import {TAG_NAME} from '../constants';
 import {useLocalLayoutEffect} from '../hooks/internal/useLocalLayoutEffect';
 import {portalWrapperComponentMap} from './internal/maps';
 
-const withPortal = <A = {}, T = React.ComponentType<A>>(component: T, fallback?: T) => {
+export interface WithPortal {
+    <A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A>;
+}
+
+const withPortal: WithPortal = (component, fallback) => {
     const wrappedComponent = portalSwitch(component, fallback);
     portalWrapperComponentMap.set(wrappedComponent, component as React.ComponentType);
-    return wrappedComponent as FC<A>;
+    return wrappedComponent as ReturnType<WithPortal>;
 };
 
 export default withPortal;

@@ -10,9 +10,9 @@
     "lint": "npm run lint:js && npm run lint:prettier",
     "lint:fix": "npm run lint:js:fix && npm run lint:prettier:fix && npm run typecheck",
     "typecheck": "tsc --noEmit",
-    "build": "npm run build-esm && npm run build-cjs",
+    "build": "npm run build-esm && npm run build-cjs && node ./esbuild/createPackage.js",
     "build-esm": "tsc",
-    "build-cjs": "webpack --config ./webpack.config.ts",
+    "build-cjs": "node ./esbuild/config.js && tsc --emitDeclarationOnly --outDir ./build/cjs",
     "prepublishOnly": "npm run build && npm pkg delete engines",
     "test": "cd tests && npm ci && npm test"
   },
@@ -24,12 +24,12 @@
     "access": "public"
   },
   "main": "./build/cjs/index.js",
-  "types": "./build/esm/index.d.ts",
+  "types": "./build/cjs/index.d.ts",
   "module": "./build/esm/index.js",
   "type": "commonjs",
+  "sideEffects": false,
   "dependencies": {
-    "@mdx-js/mdx": "^3.1.0",
-    "@mdx-js/react": "^3.1.0"
+    "@mdx-js/mdx": "^3.1.0"
   },
   "files": [
     "build"
@@ -48,6 +48,7 @@
     "@types/node": "^22.15.21",
     "@types/react": "^18.3.14",
     "@types/react-dom": "^18.3.3",
+    "esbuild": "^0.25.5",
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.0.4",
     "husky": "^9.1.7",
@@ -55,21 +56,12 @@
     "prettier": "^3.4.2",
     "react": "^16.8.0  || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-dom": "^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
-    "ts-loader": "^9.5.2",
-    "ts-node": "^10.9.2",
-    "tslib": "^2.8.1",
     "typescript": "^5.7.2",
-    "unified": "^11.0.5",
-    "webpack": "^5.99.9",
-    "webpack-cli": "^6.0.1"
+    "unified": "^11.0.5"
   },
   "peerDependencies": {
     "react": "^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-dom": "^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
-  },
-  "engines": {
-    "node": ">= 20",
-    "npm": ">= 9"
   },
   "browserslist": [
     "extends @gravity-ui/browserslist-config"

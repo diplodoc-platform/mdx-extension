@@ -68,5 +68,5 @@ const path = require('path');
         }),
     ]);
 
-    await replaceMdxRequire(path.join(__dirname, relOutput), mdxPath);
+    await replaceMdxRequire(path.join(process.cwd(), relOutput), mdxPath);
 })();

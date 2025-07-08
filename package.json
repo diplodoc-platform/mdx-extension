@@ -10,9 +10,9 @@
     "lint": "npm run lint:js && npm run lint:prettier",
     "lint:fix": "npm run lint:js:fix && npm run lint:prettier:fix && npm run typecheck",
     "typecheck": "tsc --noEmit",
-    "build": "npm run build-esm && npm run build-cjs && node ./createPackage.js",
+    "build": "npm run build-esm && npm run build-cjs && node ./esbuild/createPackage.js",
     "build-esm": "tsc",
-    "build-cjs": "node ./esbuild.js && tsc --emitDeclarationOnly --outDir ./build/cjs",
+    "build-cjs": "node ./esbuild/config.js && tsc --emitDeclarationOnly --outDir ./build/cjs",
     "prepublishOnly": "npm run build && npm pkg delete engines",
     "test": "cd tests && npm ci && npm test"
   },

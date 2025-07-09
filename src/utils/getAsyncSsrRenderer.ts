@@ -1,10 +1,10 @@
 import type {MDXComponents} from 'mdx/types';
 import {type CompileOptions, type RunOptions, compile, run} from '@mdx-js/mdx';
 import React from 'react';
-import type {MdxArtifacts} from '../types';
+import type {MdxArtifacts, ReactContextLike} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {generateUniqueId, getInitMdxArtifacts, isPortal} from './internal/common';
+import {generateUniqueId, getInitMdxArtifacts, isPortal, isReactContext} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import {AsyncComponentWrapper, getMdxRuntimeWithHook} from './internal/asyncRenderTools';
@@ -21,18 +21,28 @@ export interface GetAsyncSsrRendererProps {
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     compileOptions?: CompileOptions;
+    contextList?: ReactContextLike[];
+    contextValueList?: {ctx: ReactContextLike; value: unknown}[];
 }
 
 const getAsyncSsrRenderer = ({
     components,
     pureComponents,
     compileOptions,
+    contextList = [],
+    contextValueList = [],
 }: GetAsyncSsrRendererProps) => {
     const componentsNames = Object.keys(components || {});
     const combinedComponents = {
         ...components,
         ...pureComponents,
     };
+
+    const contextValueMap = new Map<React.Context<unknown>, unknown>();
+    contextValueList.forEach(({ctx, value}) => {
+        isReactContext(ctx);
+        contextValueMap.set(ctx, value);
+    });
 
     const render = async (id: string, mdx: string, tagName: string) => {
         const vFile = await compile(mdx, {
@@ -71,16 +81,25 @@ const getAsyncSsrRenderer = ({
         let html = renderToString(
             React.createElement(TAG_NAME, {
                 className: id,
-                children: React.createElement(MdxPortalSetterCtx.Provider, {
-                    value: () => {},
-                    children: React.createElement(MdxSetStateCtx.Provider, {
-                        value: setState,
-                        children: React.createElement(MdxStateCtx.Provider, {
-                            value: state,
-                            children: React.createElement(Component),
+                children: contextList?.reduce<React.ReactNode>(
+                    (acc, ctx) => {
+                        isReactContext(ctx);
+                        return React.createElement(ctx.Provider, {
+                            value: contextValueMap.get(ctx),
+                            children: acc,
+                        });
+                    },
+                    React.createElement(MdxPortalSetterCtx.Provider, {
+                        value: () => {},
+                        children: React.createElement(MdxSetStateCtx.Provider, {
+                            value: setState,
+                            children: React.createElement(MdxStateCtx.Provider, {
+                                value: state,
+                                children: React.createElement(Component),
+                            }),
                         }),
                     }),
-                }),
+                ),
             }),
             options,
         );

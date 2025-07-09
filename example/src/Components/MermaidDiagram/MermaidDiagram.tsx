@@ -1,6 +1,6 @@
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC, useContext, useEffect, useState} from 'react';
 import mermaid from 'mermaid';
-import {Skeleton} from '@gravity-ui/uikit';
+import {Skeleton, ThemeContext} from '@gravity-ui/uikit';
 import './MermaidDiagram.scss';
 
 interface MermaidDiagramProps {
@@ -9,6 +9,7 @@ interface MermaidDiagramProps {
 }
 
 const MermaidDiagram: FC<MermaidDiagramProps> = ({children, skeletonHeight = 10}) => {
+    const {themeValue} = useContext(ThemeContext) ?? {};
     const [svg, setSvg] = useState('');
 
     useEffect(() => {
@@ -17,8 +18,8 @@ const MermaidDiagram: FC<MermaidDiagramProps> = ({children, skeletonHeight = 10}
                 // Инициализируем Mermaid
                 mermaid.initialize({
                     startOnLoad: true,
-                    theme: 'default',
                     flowchart: {useMaxWidth: false},
+                    theme: themeValue === 'dark' ? 'dark' : 'default',
                 });
 
                 // Получаем текст диаграммы из children
@@ -32,7 +33,7 @@ const MermaidDiagram: FC<MermaidDiagramProps> = ({children, skeletonHeight = 10}
                 setSvg(`<div class="mermaid-error">Diagram rendering failed</div>`);
             }
         })();
-    }, [children]);
+    }, [children, themeValue]);
 
     return (
         <div className="mermaid-container">

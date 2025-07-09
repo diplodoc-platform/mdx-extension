@@ -1,4 +1,4 @@
-import {Alert, Button, Label, Skeleton} from '@gravity-ui/uikit';
+import {Alert, Button, Label, Skeleton, ThemeContext} from '@gravity-ui/uikit';
 import {CompatTable} from '@/Components/CompatTable/CompatTable';
 import MermaidDiagram from '@/Components/MermaidDiagram/MermaidDiagram';
 import {Counter} from '@/Components/Counter/Counter';
@@ -8,6 +8,8 @@ import KatexFormula from '@/Components/KatexFormula/KatexFormula';
 import {withInitialProps, withPortal} from '@plugin';
 import {getInitialProps} from '@/Components/Counter/getInitialProps';
 import React from 'react';
+import ThemeToggle from '@/Components/ThemeToggle/ThemeToggle';
+import {SetThemeCtx} from '@/hooks/SetThemeCtx';
 
 export const COMPONENTS = {
     Button,
@@ -15,6 +17,7 @@ export const COMPONENTS = {
     Tabs: withPortal(TabsLocal, () => <Skeleton style={{height: `${36}px`}} />),
     Tab: TabLocal,
     MermaidDiagram,
+    ThemeToggle,
 };
 
 export const SSR_COMPONENTS = {
@@ -28,3 +31,7 @@ export const PURE_COMPONENTS = {
     CompatTable,
     Alert,
 };
+
+export const CONTEXT_LIST = [ThemeContext, SetThemeCtx];
+
+export const CONTEXT_VALUE_LIST = [];

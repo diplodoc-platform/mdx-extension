@@ -1,3 +1,5 @@
+import React from 'react';
+
 export type {WithInitialProps} from './utils/withInitialProps';
 
 export interface MdxArtifacts {
@@ -18,3 +20,5 @@ export interface MDXGetInitialProps<
 > {
     (props: MdxProps, mdxSate: MdxState): Promise<ComponentProps> | ComponentProps;
 }
+
+export type ReactContextLike = React.Context<unknown> | {Provider: unknown};

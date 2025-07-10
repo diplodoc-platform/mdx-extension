@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.5.5...v1.6.0) (2025-07-10)
+
+
+### Features
+
+* **contextList:** add context proxy ([#56](https://github.com/diplodoc-platform/mdx-extension/issues/56)) ([d0ea157](https://github.com/diplodoc-platform/mdx-extension/commit/d0ea157a8467a53fe832c1996fd0412a8445bc98))
+
 ## [1.5.5](https://github.com/diplodoc-platform/mdx-extension/compare/v1.5.4...v1.5.5) (2025-07-08)
 
 

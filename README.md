@@ -17,6 +17,7 @@ yarn add @diplodoc/mdx-extension
 
 - Seamlessly integrate JSX/MDX components within markdown content
 - Support for both client-side (CSR) and server-side (SSR) rendering
+- Context support with tracking of context changes
 - Multiple syntax options:
   - Explicit `<MDX>...</MDX>` tags
   - Short form JSX fragments `<>...</>`
@@ -241,6 +242,7 @@ React hook for client-side MDX processing.
 - `components`: Object of React components to use
 - `mdxArtifacts`: MDX artifacts from transform
 - `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
+- `contextList?`: Array of React contexts to provide to MDX components
 
 ### `useMdxSsr(options: UseMdxSsrProps): React.Fragment`
 
@@ -253,6 +255,7 @@ React hook for SSR-processed MDX content.
 - `components`: Object of React components to use
 - `mdxArtifacts`: MDX artifacts from transform
 - `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
+- `contextList?`: Array of React contexts to provide to MDX components
 
 ### `getRenderer(options: GetRenderProps)`
 
@@ -271,6 +274,7 @@ Creates an SSR renderer function for server-side processing.
 - `components`: Object of React components to use
 - `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
 - `compileOptions?`: MDX compilation options (see [MDX documentation](https://mdxjs.com/packages/mdx/#compileoptions))
+- `contextList?`: Array of React contexts to provide to MDX components. Use `{ ctx, initValue }` format to pass initial values for SSR
 
 ### `getAsyncSsrRenderer(options: GetAsyncSsrRendererProps)`
 
@@ -281,6 +285,7 @@ Creates an asynchronous SSR renderer that supports `withInitialProps`.
 - `components`: Object of React components to use
 - `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
 - `compileOptions?`: MDX compilation options (see [MDX documentation](https://mdxjs.com/packages/mdx/#compileoptions))
+- `contextList?`: Array of React contexts to provide to MDX components. Use `{ ctx, initValue }` format to pass initial values for SSR
 
 ### `getMdxCollectPlugin(options: Options)`
 

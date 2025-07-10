@@ -1,8 +1,9 @@
 import React, {useLayoutEffect, useMemo, useRef} from 'react';
-import type {MdxArtifacts} from '../types';
+import type {ContextList, MdxArtifacts} from '../types';
 import {idMdxToComponents, renderMdxComponents} from '../utils/internal/common';
 import type {MDXComponents} from 'mdx/types';
 import usePortals from './internal/usePortals';
+import useContextProxy from './internal/useContextProxy';
 
 export interface UseMdxProps {
     html: string;
@@ -10,9 +11,17 @@ export interface UseMdxProps {
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     mdxArtifacts?: MdxArtifacts;
+    contextList?: ContextList;
 }
 
-const useMdx = ({refCtr, html, components, pureComponents, mdxArtifacts}: UseMdxProps) => {
+const useMdx = ({
+    refCtr,
+    html,
+    components,
+    pureComponents,
+    mdxArtifacts,
+    contextList,
+}: UseMdxProps) => {
     const refUmount = useRef(() => {});
 
     const {portalsNode, setPortal} = usePortals();
@@ -29,6 +38,8 @@ const useMdx = ({refCtr, html, components, pureComponents, mdxArtifacts}: UseMdx
     );
 
     const idTagName = useMemo(() => mdxArtifacts?.idTagName ?? {}, [mdxArtifacts]);
+
+    const {getCtxEmitterRef, listenerNode} = useContextProxy(contextList);
 
     // render new html
     useLayoutEffect(() => {
@@ -70,10 +81,21 @@ const useMdx = ({refCtr, html, components, pureComponents, mdxArtifacts}: UseMdx
             ctr,
             components: combinedComponents,
             setPortal,
+            getCtxEmitterRef,
+            contextList,
         });
-    }, [refCtr, html, combinedComponents, idMdxComponent, idTagName, setPortal]);
+    }, [
+        refCtr,
+        html,
+        combinedComponents,
+        idMdxComponent,
+        idTagName,
+        setPortal,
+        getCtxEmitterRef,
+        contextList,
+    ]);
 
-    return portalsNode;
+    return React.createElement(React.Fragment, null, portalsNode, listenerNode);
 };
 
 export default useMdx;

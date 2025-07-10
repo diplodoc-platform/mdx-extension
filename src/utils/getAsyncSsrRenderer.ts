@@ -1,10 +1,15 @@
 import type {MDXComponents} from 'mdx/types';
 import {type CompileOptions, type RunOptions, compile, run} from '@mdx-js/mdx';
 import React from 'react';
-import type {MdxArtifacts} from '../types';
+import type {ContextList, MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {generateUniqueId, getInitMdxArtifacts, isPortal} from './internal/common';
+import {
+    generateUniqueId,
+    getCtxFromCtxItem,
+    getInitMdxArtifacts,
+    isPortal,
+} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import {AsyncComponentWrapper, getMdxRuntimeWithHook} from './internal/asyncRenderTools';
@@ -21,12 +26,14 @@ export interface GetAsyncSsrRendererProps {
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     compileOptions?: CompileOptions;
+    contextList?: ContextList;
 }
 
 const getAsyncSsrRenderer = ({
     components,
     pureComponents,
     compileOptions,
+    contextList = [],
 }: GetAsyncSsrRendererProps) => {
     const componentsNames = Object.keys(components || {});
     const combinedComponents = {
@@ -71,16 +78,25 @@ const getAsyncSsrRenderer = ({
         let html = renderToString(
             React.createElement(TAG_NAME, {
                 className: id,
-                children: React.createElement(MdxPortalSetterCtx.Provider, {
-                    value: () => {},
-                    children: React.createElement(MdxSetStateCtx.Provider, {
-                        value: setState,
-                        children: React.createElement(MdxStateCtx.Provider, {
-                            value: state,
-                            children: React.createElement(Component),
+                children: contextList?.reduce<React.ReactNode>(
+                    (acc, ctxItem) => {
+                        const {ctx, initValue} = getCtxFromCtxItem(ctxItem);
+                        return React.createElement(ctx.Provider, {
+                            value: initValue,
+                            children: acc,
+                        });
+                    },
+                    React.createElement(MdxPortalSetterCtx.Provider, {
+                        value: () => {},
+                        children: React.createElement(MdxSetStateCtx.Provider, {
+                            value: setState,
+                            children: React.createElement(MdxStateCtx.Provider, {
+                                value: state,
+                                children: React.createElement(Component),
+                            }),
                         }),
                     }),
-                }),
+                ),
             }),
             options,
         );

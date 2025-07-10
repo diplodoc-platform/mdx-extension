@@ -1,7 +1,7 @@
 'use client';
 import React, {Fragment, useMemo, useRef} from 'react';
 import {CONTENT} from '@/constants';
-import {COMPONENTS, PURE_COMPONENTS} from '@/components';
+import {COMPONENTS, CONTEXT_LIST, PURE_COMPONENTS} from '@/components';
 
 import '@diplodoc/transform/dist/css/yfm.css';
 import transform from '@diplodoc/transform';
@@ -29,6 +29,7 @@ const NoSsrPage: React.FC = () => {
         html,
         components: COMPONENTS,
         pureComponents: PURE_COMPONENTS,
+        contextList: CONTEXT_LIST,
         mdxArtifacts,
     });
 

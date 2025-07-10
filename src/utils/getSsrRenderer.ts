@@ -4,7 +4,7 @@ import * as runtime from 'react/jsx-runtime';
 import React from 'react';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {isPortal, runSync} from './internal/common';
+import {getCtxFromCtxItem, isPortal, runSync} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import type {GetHtmlProps} from './internal/types';
@@ -15,14 +15,21 @@ import {
     trimPortalTag,
     wrapObject,
 } from './internal/ssr';
+import type {ContextList} from '../types';
 
 export interface GetSsrRendererProps {
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     compileOptions?: CompileOptions;
+    contextList?: ContextList;
 }
 
-const getSsrRenderer = ({components, pureComponents, compileOptions}: GetSsrRendererProps) => {
+const getSsrRenderer = ({
+    components,
+    pureComponents,
+    compileOptions,
+    contextList = [],
+}: GetSsrRendererProps) => {
     const componentsNames = Object.keys(components || {});
     const usedComponents = new Set<string>();
     const combinedComponents = {
@@ -57,18 +64,27 @@ const getSsrRenderer = ({components, pureComponents, compileOptions}: GetSsrRend
         let html = renderToString(
             React.createElement(TAG_NAME, {
                 className: id,
-                children: React.createElement(MdxPortalSetterCtx.Provider, {
-                    value: () => {},
-                    children: React.createElement(MdxSetStateCtx.Provider, {
-                        value: setState,
-                        children: React.createElement(MdxStateCtx.Provider, {
-                            value: state,
-                            children: React.createElement(Component, {
-                                components: combinedComponentsWatch,
+                children: contextList?.reduce<React.ReactNode>(
+                    (acc, ctxItem) => {
+                        const {ctx, initValue} = getCtxFromCtxItem(ctxItem);
+                        return React.createElement(ctx.Provider, {
+                            value: initValue,
+                            children: acc,
+                        });
+                    },
+                    React.createElement(MdxPortalSetterCtx.Provider, {
+                        value: () => {},
+                        children: React.createElement(MdxSetStateCtx.Provider, {
+                            value: setState,
+                            children: React.createElement(MdxStateCtx.Provider, {
+                                value: state,
+                                children: React.createElement(Component, {
+                                    components: combinedComponentsWatch,
+                                }),
                             }),
                         }),
                     }),
-                }),
+                ),
             }),
             options,
         );

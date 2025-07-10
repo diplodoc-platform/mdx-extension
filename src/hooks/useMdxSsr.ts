@@ -1,6 +1,6 @@
 import React, {useLayoutEffect, useMemo, useRef} from 'react';
-import type {MdxArtifacts, ReactContextLike} from '../types';
-import {idMdxToComponents, isReactContext, renderMdxComponents} from '../utils/internal/common';
+import type {ContextList, MdxArtifacts} from '../types';
+import {idMdxToComponents, renderMdxComponents} from '../utils/internal/common';
 import type {MDXComponents} from 'mdx/types';
 import usePortals from './internal/usePortals';
 import useContextProxy from './internal/useContextProxy';
@@ -11,7 +11,7 @@ export interface UseMdxSsrProps {
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     mdxArtifacts?: MdxArtifacts;
-    contextList?: ReactContextLike[];
+    contextList?: ContextList;
 }
 
 const useMdxSsr = ({
@@ -22,8 +22,6 @@ const useMdxSsr = ({
     pureComponents,
     contextList,
 }: UseMdxSsrProps) => {
-    isReactContext<undefined | React.Context<unknown>>(contextList);
-
     const refUmount = useRef(() => {});
 
     const {portalsNode, setPortal} = usePortals();

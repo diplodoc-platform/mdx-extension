@@ -1,13 +1,15 @@
 import React, {useCallback, useMemo, useRef} from 'react';
 import type {CtxProxyRef} from '../../components/internal/CtxProxy';
 import CtxListener from '../../components/internal/CtxListener';
+import type {ContextList, ContextWithValue} from '../../types';
+import {getCtxFromCtxItem} from '../../utils/internal/common';
 
 export type ListenCtxFn = (
     Content: React.ComponentType,
     ctx: React.Context<unknown> | null,
 ) => {ref: React.Ref<CtxProxyRef>; value: unknown};
 
-const useContextProxy = (contextList?: React.Context<unknown>[]) => {
+const useContextProxy = (contextList?: ContextList) => {
     const refCtxValue = useRef<Map<React.Context<unknown>, unknown>>(new Map());
     const refContentCtxListMap = useRef<
         Map<
@@ -31,7 +33,8 @@ const useContextProxy = (contextList?: React.Context<unknown>[]) => {
 
     const listenerNodes = useMemo(() => {
         if (!contextList) return [];
-        return contextList.map((ctx, idx) => {
+        return contextList.map((ctxItem, idx) => {
+            const {ctx} = getCtxFromCtxItem(ctxItem as ContextWithValue<unknown>);
             return React.createElement(CtxListener, {
                 key: `ctx-${ctx.displayName ?? idx}`,
                 ctx,

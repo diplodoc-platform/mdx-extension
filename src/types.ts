@@ -21,4 +21,13 @@ export interface MDXGetInitialProps<
     (props: MdxProps, mdxSate: MdxState): Promise<ComponentProps> | ComponentProps;
 }
 
-export type ReactContextLike = React.Context<unknown> | {Provider: unknown};
+export type ReactContextLike<T> =
+    | React.Context<T>
+    | {Provider: T; Consumer: T; displayName?: string};
+
+export type ContextWithValue<T> = {
+    ctx: ReactContextLike<T>;
+    initValue: T;
+};
+
+export type ContextList = (ReactContextLike<unknown> | ContextWithValue<unknown>)[];

@@ -8,7 +8,7 @@ import {
     MdxPortalSetterCtx,
 } from '../../context/internal/MdxPortalSetterCtx';
 import {portalWrapperComponentMap} from './maps';
-import type {MdxArtifacts} from '../../types';
+import type {ContextList, ContextWithValue, MdxArtifacts, ReactContextLike} from '../../types';
 import CtxProxy from '../../components/internal/CtxProxy';
 import type {ListenCtxFn} from '../../hooks/internal/useContextProxy';
 
@@ -24,7 +24,7 @@ interface RenderMdxComponentsProps {
     idTagName: Record<string, string>;
     setPortal: (props: MdxPortalCtxSetterProps) => void;
     getCtxEmitterRef: ListenCtxFn;
-    contextList?: React.Context<unknown>[];
+    contextList?: ContextList;
 }
 
 export const renderMdxComponents = ({
@@ -77,7 +77,8 @@ export const renderMdxComponents = ({
         } else {
             const reactNode = React.createElement(MdxPortalSetterCtx.Provider, {
                 value: setPortal,
-                children: contextList.reduce((acc, ctx) => {
+                children: contextList.reduce((acc, ctxItem) => {
+                    const {ctx} = getCtxFromCtxItem(ctxItem);
                     const {ref, value} = getCtxEmitterRef(Content, ctx);
                     return React.createElement(CtxProxy, {
                         ref,
@@ -151,4 +152,17 @@ export function runSync(code: string, options: unknown) {
     return new Function(String(code))(options);
 }
 
-export function isReactContext<T = React.Context<unknown>>(_: unknown): asserts _ is T {}
+export function getCtxFromCtxItem<T>(ctxItem: ReactContextLike<T> | ContextWithValue<T>) {
+    let ctx;
+    let initValue: unknown | undefined;
+    if ('ctx' in ctxItem) {
+        ctx = ctxItem.ctx;
+        initValue = ctxItem.initValue;
+    } else {
+        ctx = ctxItem;
+    }
+    return {
+        ctx: ctx as React.Context<unknown>,
+        initValue,
+    };
+}

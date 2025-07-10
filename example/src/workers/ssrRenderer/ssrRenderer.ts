@@ -4,7 +4,7 @@ import transform from '@diplodoc/transform';
 import DefaultPlugins from '@diplodoc/transform/lib/plugins';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {isWithMdxArtifacts, mdxPlugin} from '@plugin';
-import {CONTEXT_VALUE_LIST, PURE_COMPONENTS, SSR_COMPONENTS} from '@/components';
+import {CONTEXT_LIST, PURE_COMPONENTS, SSR_COMPONENTS} from '@/components';
 import getAsyncSsrRenderer from '../../../../src/utils/getAsyncSsrRenderer';
 import {transform as swcTransform} from '@swc/core';
 
@@ -16,7 +16,7 @@ const getContent = async (content: string) => {
     const {render, renderAsync} = getAsyncSsrRenderer({
         components: SSR_COMPONENTS,
         pureComponents: PURE_COMPONENTS,
-        contextValueList: CONTEXT_VALUE_LIST,
+        contextList: CONTEXT_LIST,
     });
 
     const {result} = transform(content, {

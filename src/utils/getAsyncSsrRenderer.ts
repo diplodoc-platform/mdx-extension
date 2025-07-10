@@ -1,10 +1,15 @@
 import type {MDXComponents} from 'mdx/types';
 import {type CompileOptions, type RunOptions, compile, run} from '@mdx-js/mdx';
 import React from 'react';
-import type {MdxArtifacts, ReactContextLike} from '../types';
+import type {ContextList, MdxArtifacts} from '../types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {generateUniqueId, getInitMdxArtifacts, isPortal, isReactContext} from './internal/common';
+import {
+    generateUniqueId,
+    getCtxFromCtxItem,
+    getInitMdxArtifacts,
+    isPortal,
+} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import {AsyncComponentWrapper, getMdxRuntimeWithHook} from './internal/asyncRenderTools';
@@ -21,8 +26,7 @@ export interface GetAsyncSsrRendererProps {
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     compileOptions?: CompileOptions;
-    contextList?: ReactContextLike[];
-    contextValueList?: {ctx: ReactContextLike; value: unknown}[];
+    contextList?: ContextList;
 }
 
 const getAsyncSsrRenderer = ({
@@ -30,19 +34,12 @@ const getAsyncSsrRenderer = ({
     pureComponents,
     compileOptions,
     contextList = [],
-    contextValueList = [],
 }: GetAsyncSsrRendererProps) => {
     const componentsNames = Object.keys(components || {});
     const combinedComponents = {
         ...components,
         ...pureComponents,
     };
-
-    const contextValueMap = new Map<React.Context<unknown>, unknown>();
-    contextValueList.forEach(({ctx, value}) => {
-        isReactContext(ctx);
-        contextValueMap.set(ctx, value);
-    });
 
     const render = async (id: string, mdx: string, tagName: string) => {
         const vFile = await compile(mdx, {
@@ -82,10 +79,10 @@ const getAsyncSsrRenderer = ({
             React.createElement(TAG_NAME, {
                 className: id,
                 children: contextList?.reduce<React.ReactNode>(
-                    (acc, ctx) => {
-                        isReactContext(ctx);
+                    (acc, ctxItem) => {
+                        const {ctx, initValue} = getCtxFromCtxItem(ctxItem);
                         return React.createElement(ctx.Provider, {
-                            value: contextValueMap.get(ctx),
+                            value: initValue,
                             children: acc,
                         });
                     },

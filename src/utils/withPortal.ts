@@ -6,10 +6,10 @@ import {useLocalLayoutEffect} from '../hooks/internal/useLocalLayoutEffect';
 import {portalWrapperComponentMap} from './internal/maps';
 
 export interface WithPortal {
-    <A = unknown, B = unknown, T = React.ElementType<A>, F = React.ElementType<B>>(
+    <A = unknown, T = React.ElementType<A>, F = React.ElementType<A>>(
         component: T,
         fallback?: F,
-    ): T | F;
+    ): FC<A>;
 }
 
 const withPortal: WithPortal = (component, fallback) => {
@@ -18,7 +18,7 @@ const withPortal: WithPortal = (component, fallback) => {
         fallback as React.ComponentType,
     );
     portalWrapperComponentMap.set(wrappedComponent, component as React.ComponentType);
-    return wrappedComponent as typeof component;
+    return wrappedComponent as FC<unknown>;
 };
 
 export default withPortal;

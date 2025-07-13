@@ -1,8 +1,7 @@
 import {replaceBlocks} from './utils/internal/plugin';
-import {type GetSsrRendererProps} from './utils/getSsrRenderer';
+import {type GetAsyncSsrRendererProps, type GetSsrRendererProps} from './utils';
 import {getAsyncSsrRenderer, getSsrRenderer} from './utils';
 import type {MdxArtifacts} from './types';
-import type {GetAsyncSsrRendererProps} from './utils/getAsyncSsrRenderer';
 import {getInitMdxArtifacts} from './utils/internal/common';
 
 export interface GetMdxCollectPluginOptions extends Omit<GetSsrRendererProps, 'components'> {

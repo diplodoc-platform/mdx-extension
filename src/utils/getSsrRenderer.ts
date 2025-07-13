@@ -64,7 +64,7 @@ const getSsrRenderer = ({
         let html = renderToString(
             React.createElement(TAG_NAME, {
                 className: id,
-                children: contextList?.reduce<React.ReactNode>(
+                children: contextList.reduce<React.ReactNode>(
                     (acc, ctxItem) => {
                         const {ctx, initValue} = getCtxFromCtxItem(ctxItem);
                         return React.createElement(ctx.Provider, {

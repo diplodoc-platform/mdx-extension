@@ -65,9 +65,7 @@ export const renderMdxComponents = ({
         if (isTopLevelPortal) {
             if (!nodePortalCleanup.has(node)) {
                 nodePortalCleanup.set(node, true);
-                while (node.firstChild) {
-                    node.removeChild(node.firstChild);
-                }
+                node.textContent = null;
             }
             setPortal({
                 id,

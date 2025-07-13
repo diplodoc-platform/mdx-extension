@@ -49,7 +49,7 @@ const getSsrRenderer = ({
         let code: string | undefined = vFile.toString();
         const {default: Component} = runSync(code, runtime);
 
-        const isTopLevelPortal = isPortal(combinedComponents[tagName] as React.ComponentType);
+        const isTopLevelPortal = isPortal(combinedComponents[tagName] as React.ElementType);
 
         const state = {};
         const setState = (value: MdxStateCtxValue) => {
@@ -64,7 +64,7 @@ const getSsrRenderer = ({
         let html = renderToString(
             React.createElement(TAG_NAME, {
                 className: id,
-                children: contextList?.reduce<React.ReactNode>(
+                children: contextList.reduce<React.ReactNode>(
                     (acc, ctxItem) => {
                         const {ctx, initValue} = getCtxFromCtxItem(ctxItem);
                         return React.createElement(ctx.Provider, {

@@ -3,14 +3,13 @@ import type {MdxStateCtxValue} from '../../context';
 import * as runtime from 'react/jsx-runtime';
 import {componentGetInitProps, portalWrapperComponentMap} from './maps';
 
-const getInitPropsFn = <C extends React.ComponentType, T = React.ComponentProps<C>>(
-    component: React.ComponentType,
-) => {
+const getInitPropsFn = (component: React.ElementType) => {
+    if (!component || typeof component !== 'object') return;
     const origComponent = portalWrapperComponentMap.get(component);
     const initFn =
         componentGetInitProps.get(component) ??
         (origComponent && componentGetInitProps.get(origComponent));
-    return initFn as ((props: Object, mdxState: MdxStateCtxValue) => Promise<T> | T) | undefined;
+    return initFn;
 };
 
 type JSXFnParameters = Parameters<typeof runtime.jsx>;
@@ -47,10 +46,10 @@ export function getMdxRuntimeWithHook() {
             const {args} = ref;
             replaceComponentRefs(args);
             const [component, props] = args;
-            const initFn = getInitPropsFn(component as React.ComponentType);
+            const initFn = getInitPropsFn(component);
             if (initFn) {
-                const readyProps = await initFn(props as {}, state);
-                args[1] = {...(props as {}), ...readyProps};
+                const readyProps = await initFn(props, state);
+                args[1] = readyProps;
             }
         }
     };
@@ -63,7 +62,7 @@ function replaceComponentRefs(thing: unknown): unknown {
     }
 
     if (Array.isArray(thing)) {
-        const arr = thing as unknown[];
+        const arr = thing;
         for (let i = 0, len = arr.length; i < len; i++) {
             // eslint-disable-next-line no-param-reassign
             arr[i] = replaceComponentRefs(arr[i]);
@@ -72,7 +71,7 @@ function replaceComponentRefs(thing: unknown): unknown {
     }
 
     if (typeof thing === 'object' && thing !== null) {
-        const obj = thing as {[key: string]: unknown};
+        const obj = thing as Record<string, unknown>;
         for (const key in obj) {
             if (Object.prototype.hasOwnProperty.call(obj, key)) {
                 obj[key as keyof typeof obj] = replaceComponentRefs(obj[key]);

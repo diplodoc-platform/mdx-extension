@@ -1,16 +1,13 @@
 import React from 'react';
 import type {MDXGetInitialProps} from '../types';
-import {componentGetInitProps} from './internal/maps';
+import {type IGetInitProps, componentGetInitProps} from './internal/maps';
 
 export interface WithInitialProps {
-    <A = {}, T = React.ComponentType<A>>(
-        component: T,
-        getInitProps: MDXGetInitialProps<A, never, never>,
-    ): T;
+    <A = unknown, T = React.ComponentType<A>>(component: T, getInitProps: MDXGetInitialProps<A>): T;
 }
 
 const withInitialProps: WithInitialProps = (component, getInitProps) => {
-    componentGetInitProps.set(component as React.ComponentType, getInitProps);
+    componentGetInitProps.set(component as React.ComponentType, getInitProps as IGetInitProps);
     return component;
 };
 

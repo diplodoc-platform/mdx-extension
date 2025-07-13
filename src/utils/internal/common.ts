@@ -59,15 +59,13 @@ export const renderMdxComponents = ({
         });
 
         const isTopLevelPortal =
-            components && isPortal(components[idTagName[id]] as React.ComponentType);
+            components && isPortal(components[idTagName[id]] as React.ElementType);
 
         let root: Root | undefined;
         if (isTopLevelPortal) {
             if (!nodePortalCleanup.has(node)) {
                 nodePortalCleanup.set(node, true);
-                while (node.firstChild) {
-                    node.removeChild(node.firstChild);
-                }
+                node.textContent = null;
             }
             setPortal({
                 id,
@@ -138,7 +136,8 @@ export function generateUniqueId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
 
-export function isPortal(component: React.ComponentType) {
+export function isPortal(component: React.ElementType) {
+    if (!component || typeof component !== 'object') return false;
     return portalWrapperComponentMap.has(component);
 }
 
@@ -162,7 +161,7 @@ export function getCtxFromCtxItem<T>(ctxItem: ReactContextLike<T> | ContextWithV
         ctx = ctxItem;
     }
     return {
-        ctx: ctx as React.Context<unknown>,
+        ctx: ctx as React.Context<T>,
         initValue,
     };
 }

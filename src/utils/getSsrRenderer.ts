@@ -49,7 +49,7 @@ const getSsrRenderer = ({
         let code: string | undefined = vFile.toString();
         const {default: Component} = runSync(code, runtime);
 
-        const isTopLevelPortal = isPortal(combinedComponents[tagName] as React.ComponentType);
+        const isTopLevelPortal = isPortal(combinedComponents[tagName] as React.ElementType);
 
         const state = {};
         const setState = (value: MdxStateCtxValue) => {

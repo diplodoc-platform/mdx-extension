@@ -1,4 +1,5 @@
 import React from 'react';
+import type {MdxStateCtxValue} from './context';
 
 export type {WithInitialProps} from './utils/withInitialProps';
 
@@ -13,17 +14,16 @@ export interface MdxPluginEnv {
 
 export type MDXRenderer = (mdx: string, mdxArtifacts: MdxArtifacts) => string;
 
-export interface MDXGetInitialProps<
-    ComponentProps = Record<string, unknown>,
-    MdxState = ComponentProps,
-    MdxProps = ComponentProps,
-> {
-    (props: MdxProps, mdxSate: MdxState): Promise<ComponentProps> | ComponentProps;
+export interface MDXGetInitialProps<ComponentProps = unknown> {
+    (
+        props: ComponentProps,
+        mdxSate: Exclude<MdxStateCtxValue, null>,
+    ): Promise<ComponentProps> | ComponentProps;
 }
 
 export type ReactContextLike<T> =
     | React.Context<T>
-    | {Provider: T; Consumer: T; displayName?: string};
+    | {Provider: unknown; Consumer: unknown; displayName?: string};
 
 export type ContextWithValue<T> = {
     ctx: ReactContextLike<T>;

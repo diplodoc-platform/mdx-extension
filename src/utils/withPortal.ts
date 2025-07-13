@@ -6,31 +6,37 @@ import {useLocalLayoutEffect} from '../hooks/internal/useLocalLayoutEffect';
 import {portalWrapperComponentMap} from './internal/maps';
 
 export interface WithPortal {
-    <A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A>;
+    <A = unknown, B = unknown, T = React.ElementType<A>, F = React.ElementType<B>>(
+        component: T,
+        fallback?: F,
+    ): T | F;
 }
 
 const withPortal: WithPortal = (component, fallback) => {
-    const wrappedComponent = portalSwitch(component, fallback);
+    const wrappedComponent = portalSwitch(
+        component as React.ComponentType,
+        fallback as React.ComponentType,
+    );
     portalWrapperComponentMap.set(wrappedComponent, component as React.ComponentType);
-    return wrappedComponent as ReturnType<WithPortal>;
+    return wrappedComponent as typeof component;
 };
 
 export default withPortal;
 
-function portalSwitch<A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A> {
+function portalSwitch(component: React.ComponentType, fallback?: React.ComponentType): FC {
     return (props) => {
         const portalSetter = useContext(MdxPortalSetterCtx);
 
         if (!portalSetter) {
             // inside portal
-            return React.createElement(component as React.ComponentType, props as {});
+            return React.createElement(component, props);
         }
 
-        return React.createElement(portalWrapper(component, fallback), props as {});
+        return React.createElement(portalWrapper(component, fallback), props);
     };
 }
 
-function portalWrapper<A = {}, T = React.ComponentType<A>>(component: T, fallback?: T): FC<A> {
+function portalWrapper(component: React.ComponentType, fallback?: React.ComponentType): FC {
     return (props) => {
         const portalSetter = useContext(MdxPortalSetterCtx);
         const ref = useRef<HTMLSpanElement>();
@@ -56,16 +62,13 @@ function portalWrapper<A = {}, T = React.ComponentType<A>>(component: T, fallbac
             portalSetter({
                 id,
                 node,
-                reactNode: React.createElement(component as React.ComponentType, props as {}),
+                reactNode: React.createElement(component, props),
             });
         }, [id, component, props]);
 
         return React.createElement(TAG_NAME, {
             ref,
-            children:
-                mounted || !fallback
-                    ? null
-                    : React.createElement(fallback as React.ComponentType, props as {}),
+            children: mounted || !fallback ? null : React.createElement(fallback, props),
         });
     };
 }

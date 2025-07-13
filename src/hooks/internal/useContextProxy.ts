@@ -1,7 +1,7 @@
 import React, {useCallback, useMemo, useRef} from 'react';
 import type {CtxProxyRef} from '../../components/internal/CtxProxy';
 import CtxListener from '../../components/internal/CtxListener';
-import type {ContextList, ContextWithValue} from '../../types';
+import type {ContextList} from '../../types';
 import {getCtxFromCtxItem} from '../../utils/internal/common';
 
 export type ListenCtxFn = (
@@ -34,7 +34,7 @@ const useContextProxy = (contextList?: ContextList) => {
     const listenerNodes = useMemo(() => {
         if (!contextList) return [];
         return contextList.map((ctxItem, idx) => {
-            const {ctx} = getCtxFromCtxItem(ctxItem as ContextWithValue<unknown>);
+            const {ctx} = getCtxFromCtxItem(ctxItem);
             return React.createElement(CtxListener, {
                 key: `ctx-${ctx.displayName ?? idx}`,
                 ctx,

@@ -55,7 +55,7 @@ const getAsyncSsrRenderer = ({
         const {runtime, init} = getMdxRuntimeWithHook();
         const {default: componentFn} = await run(vFile, runtime as unknown as RunOptions);
 
-        const isTopLevelPortal = isPortal(combinedComponents[tagName] as React.ComponentType);
+        const isTopLevelPortal = isPortal(combinedComponents[tagName] as React.ElementType);
 
         const usedComponents = new Set<string>();
         const combinedComponentsWatch = wrapObject(combinedComponents, (name) =>

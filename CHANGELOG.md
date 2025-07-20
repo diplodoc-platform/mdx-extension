@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.2](https://github.com/diplodoc-platform/mdx-extension/compare/v1.6.1...v1.6.2) (2025-07-20)
+
+
+### Bug Fixes
+
+* **cjs:** neutral build ([#61](https://github.com/diplodoc-platform/mdx-extension/issues/61)) ([09b8092](https://github.com/diplodoc-platform/mdx-extension/commit/09b809267fb8a07d2387dfc28fa53d8babbf4cf7))
+
 ## [1.6.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.6.0...v1.6.1) (2025-07-16)
 
 

@@ -51,7 +51,7 @@ const path = require('path');
         esbuild.build({
             entryPoints: ['./src/**/*'],
             bundle: false,
-            platform: 'node',
+            platform: 'neutral',
             format: 'cjs',
             outdir: relOutput,
         }),
@@ -62,9 +62,12 @@ const path = require('path');
                 resolveDir: './node_modules',
             },
             bundle: true,
-            platform: 'node',
+            platform: 'neutral',
             format: 'cjs',
             outfile: path.join(relOutput, mdxPath),
+            alias: {
+                'style-to-js': require.resolve('style-to-js'),
+            },
         }),
     ]);
 

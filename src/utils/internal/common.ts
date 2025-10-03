@@ -40,7 +40,7 @@ export const renderMdxComponents = ({
     const unmountFns = Object.entries(idMdxComponent).map(([id, Content]) => {
         let node = ctr.querySelector<HTMLElement>(`.${id}`);
         if (!node) {
-            throw new Error('node is null');
+            return () => {};
         }
 
         if (nodeWillUmount.get(node) && node.parentNode) {

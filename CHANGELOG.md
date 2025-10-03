@@ -5,7 +5,7 @@
 
 ### Bug Fixes
 
-* added filter for not found nodes ([#65](https://github.com/diplodoc-platform/mdx-extension/issues/65)) ([5442658](https://github.com/diplodoc-platform/mdx-extension/commit/5442658f386f9cb1cf6f01395d3cd7ed9d2877ae))
+* added ignore for not found nodes ([#65](https://github.com/diplodoc-platform/mdx-extension/issues/65)) ([5442658](https://github.com/diplodoc-platform/mdx-extension/commit/5442658f386f9cb1cf6f01395d3cd7ed9d2877ae))
 
 ## [1.6.3](https://github.com/diplodoc-platform/mdx-extension/compare/v1.6.2...v1.6.3) (2025-08-19)
 

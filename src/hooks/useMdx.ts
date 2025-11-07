@@ -7,7 +7,7 @@ import useContextProxy from './internal/useContextProxy';
 
 export interface UseMdxProps {
     html: string;
-    refCtr: React.MutableRefObject<HTMLElement | null>;
+    refCtr: React.RefObject<HTMLElement | null>;
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     mdxArtifacts?: MdxArtifacts;

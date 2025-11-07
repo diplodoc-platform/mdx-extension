@@ -121,14 +121,15 @@ export const renderMdxComponents = ({
     return () => unmountFns.forEach((cb) => cb());
 };
 
-export const idMdxToComponents = (idMdx?: Record<string, string>) => {
+export const idMdxToComponents = ({idMdx, idMdxComponent}: Partial<MdxArtifacts>) => {
     return Object.entries(idMdx ?? {}).reduce<Record<string, React.ComponentType<MDXProps>>>(
         (acc, [id, fnStr]) => {
+            if (acc[id]) return acc;
             // eslint-disable-next-line no-param-reassign
             acc[id] = runSync(fnStr, runtime).default;
             return acc;
         },
-        {},
+        {...idMdxComponent},
     );
 };
 

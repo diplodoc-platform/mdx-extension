@@ -35,20 +35,20 @@
     "build"
   ],
   "devDependencies": {
-    "@commitlint/config-conventional": "^19.8.1",
+    "@commitlint/config-conventional": "^20.0.0",
     "@diplodoc/components": "^4.28.5",
     "@diplodoc/transform": "^4.57.3",
     "@gravity-ui/browserslist-config": "^4.3.0",
     "@gravity-ui/eslint-config": "^3.2.0",
     "@gravity-ui/gulp-utils": "^1.0.3",
     "@gravity-ui/prettier-config": "^1.1.0",
-    "@gravity-ui/stylelint-config": "^4.0.1",
+    "@gravity-ui/stylelint-config": "^5.0.0",
     "@gravity-ui/tsconfig": "^1.0.0",
     "@types/markdown-it": "^13.0.9",
     "@types/mdx": "^2.0.13",
     "@types/node": "^22.15.21",
-    "@types/react": "^18.3.14",
-    "@types/react-dom": "^18.3.3",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
     "esbuild": "^0.25.5",
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.0.4",
@@ -56,8 +56,8 @@
     "husky": "^9.1.7",
     "nano-staged": "^0.8.0",
     "prettier": "^3.4.2",
-    "react": "^16.8.0  || ^17.0.0 || ^18.0.0 || ^19.0.0",
-    "react-dom": "^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "typescript": "^5.7.2",
     "unified": "^11.0.5",
     "vinyl": "^3.0.1"
@@ -65,6 +65,10 @@
   "peerDependencies": {
     "react": "^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-dom": "^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom"
   },
   "browserslist": [
     "extends @gravity-ui/browserslist-config"

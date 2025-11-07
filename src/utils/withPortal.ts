@@ -39,7 +39,7 @@ function portalSwitch(component: React.ComponentType, fallback?: React.Component
 function portalWrapper(component: React.ComponentType, fallback?: React.ComponentType): FC {
     return (props) => {
         const portalSetter = useContext(MdxPortalSetterCtx);
-        const ref = useRef<HTMLSpanElement>();
+        const ref = useRef<HTMLSpanElement>(null);
         const id = useMemo(() => generateUniqueId(), []);
         const [mounted, setMounted] = useState(false);
 

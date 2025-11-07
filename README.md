@@ -395,7 +395,6 @@ Click me
 The library provides two context providers for managing state during Server-Side Rendering (SSR):
 
 - **`MdxSetStateCtx`** - A context that provides a function to update the MDX state. This function is only available during SSR (`null` on client-side). If you set a component's state using this context, it will be:
-
   - Serialized into the `data-mdx-state` attribute during SSR
   - Available in `MdxStateCtx` when the component renders
 
@@ -404,7 +403,6 @@ The library provides two context providers for managing state during Server-Side
 ### Asynchronous SSR with Initial Props
 
 - **`withInitialProps`** - A higher-order component that enables asynchronous data fetching for SSR:
-
   - When wrapping a component with this function and using `getAsyncSsrRenderer`, the `getInitialProps` function will be called
   - Receives the component's props and MDX state as arguments
   - Can return either static or promise-based props

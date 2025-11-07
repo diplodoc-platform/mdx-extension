@@ -8,7 +8,7 @@ export type CounterProps = {
 };
 
 export const Counter: React.FC<CounterProps> = ({initialValue = 0}) => {
-    const state = useContext(MdxStateCtx as React.ServerContext<MdxStateCtxValue<CounterProps>>);
+    const state = useContext(MdxStateCtx as React.Context<MdxStateCtxValue<CounterProps>>);
     const [count, setCount] = useState(state?.initialValue ?? initialValue);
 
     return (

@@ -244,6 +244,7 @@ React hook for client-side MDX processing.
 - `mdxArtifacts`: MDX artifacts from transform
 - `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
 - `contextList?`: Array of React contexts to provide to MDX components
+- `idMdxComponentLoader?`: Custom mdx component loader
 
 ### `useMdxSsr(options: UseMdxSsrProps): React.Fragment`
 
@@ -257,6 +258,7 @@ React hook for SSR-processed MDX content.
 - `mdxArtifacts`: MDX artifacts from transform
 - `pureComponents?`: Optional object of components that shouldn't hydrate (MDXComponents)
 - `contextList?`: Array of React contexts to provide to MDX components
+- `idMdxComponentLoader?`: Custom mdx component loader
 
 ### `getRenderer(options: GetRenderProps)`
 

@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useMemo, useRef} from 'react';
-import type {ContextList, CustomRunSync, MdxArtifacts} from '../types';
+import type {ContextList, MdxArtifacts} from '../types';
 import {idMdxToComponents, renderMdxComponents} from '../utils/internal/common';
 import type {MDXComponents} from 'mdx/types';
 import usePortals from './internal/usePortals';
@@ -12,7 +12,6 @@ export interface UseMdxProps {
     pureComponents?: MDXComponents;
     mdxArtifacts?: MdxArtifacts;
     contextList?: ContextList;
-    customRunSync?: CustomRunSync;
 }
 
 const useMdx = ({
@@ -22,7 +21,6 @@ const useMdx = ({
     pureComponents,
     mdxArtifacts,
     contextList,
-    customRunSync,
 }: UseMdxProps) => {
     const refUmount = useRef(() => {});
 
@@ -35,8 +33,8 @@ const useMdx = ({
 
     // building mdx scripts into components
     const idMdxComponent = useMemo(
-        () => idMdxToComponents(mdxArtifacts?.idMdx, customRunSync),
-        [mdxArtifacts?.idMdx, customRunSync],
+        () => idMdxToComponents(mdxArtifacts?.idMdx),
+        [mdxArtifacts?.idMdx],
     );
 
     const idTagName = useMemo(() => mdxArtifacts?.idTagName ?? {}, [mdxArtifacts]);

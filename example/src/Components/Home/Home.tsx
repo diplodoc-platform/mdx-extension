@@ -6,7 +6,7 @@ import {type IdMdxComponentLoader, MdxArtifacts, useMdxSsr} from '@plugin';
 import {COMPONENTS, CONTEXT_LIST, PURE_COMPONENTS} from '@/components';
 import {MDXModule, MDXProps} from 'mdx/types';
 import * as runtime from 'react/jsx-runtime';
-import {executeCodeWithPromise} from '@/utils/utils';
+import {asyncExecuteCode} from '@/utils/utils';
 
 interface HomeProps {
     html: string;
@@ -39,7 +39,7 @@ const Home: FC<HomeProps> = ({html, mdxArtifacts, withLoader}) => {
             const idMdxComponent: Record<string, React.ComponentType<MDXProps>> = {};
 
             for (const [artifactId, code] of Object.entries(mdxArtifacts?.idMdx ?? {})) {
-                const fn = await executeCodeWithPromise<(r: typeof runtime) => MDXModule>(code);
+                const fn = await asyncExecuteCode<(r: typeof runtime) => MDXModule>(code);
                 idMdxComponent[artifactId] = fn(runtime).default;
             }
 

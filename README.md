@@ -24,6 +24,7 @@ yarn add @diplodoc/mdx-extension
   - Direct React component usage `<Component />`
   - Built-in security with MDX input validation
   - Portal support for advanced component mounting with `withPortal`
+  - Asynchronous component loading support via `idMdxComponentLoader`
 
 ## Usage
 
@@ -445,6 +446,44 @@ export const PURE_COMPONENTS = {
   Label, // on client
   CompatTable,
   Alert,
+};
+```
+
+### Asynchronous Component Loading
+
+The `useMdx` and `useMdxSsr` hooks now support an optional `idMdxComponentLoader` parameter that enables asynchronous loading of MDX components:
+
+```tsx
+interface PageProps {
+  html: string;
+  mdxArtifacts?: MdxArtifacts;
+  withLoader?: boolean;
+}
+
+const Page: FC<PageProps> = ({html, mdxArtifacts}) => {
+  const [isSuccess, setSuccess] = React.useState(false);
+  const [data, setData] = React.useState<IdMdxComponentLoader['data']>(undefined);
+
+  useMdxSsr({
+    // ...other options
+    idMdxComponentLoader: {isSuccess, data},
+  });
+
+  useEffect(() => {
+    (async () => {
+      const idMdxComponent: Record<string, React.ComponentType<MDXProps>> = {};
+
+      for (const [artifactId, code] of Object.entries(mdxArtifacts?.idMdx ?? {})) {
+        const fn = await asyncExecuteCode(code);
+        idMdxComponent[artifactId] = fn(runtime).default;
+      }
+
+      setData(idMdxComponent);
+      setSuccess(true);
+    })();
+  }, [mdxArtifacts]);
+
+  // ...rest of the component
 };
 ```
 

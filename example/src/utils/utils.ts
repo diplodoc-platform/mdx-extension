@@ -1,6 +1,6 @@
 const HANDLERS_KEY = '__mdxLoader__';
 
-export function executeCodeWithPromise<T>(code: string, nonce?: string) {
+export function asyncExecuteCode<T>(code: string, nonce?: string) {
     // @ts-ignore
     const headers = (window[HANDLERS_KEY] = window[HANDLERS_KEY] || {});
 

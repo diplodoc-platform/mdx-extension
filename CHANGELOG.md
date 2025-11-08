@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.6.4...v1.7.0) (2025-11-08)
+
+
+### Features
+
+* add idMdxComponentLoader ([#69](https://github.com/diplodoc-platform/mdx-extension/issues/69)) ([4d700a3](https://github.com/diplodoc-platform/mdx-extension/commit/4d700a30c36673e5a1e8351ca795dcbd14ce27d0))
+* deps upd ([#67](https://github.com/diplodoc-platform/mdx-extension/issues/67)) ([a6b9ce7](https://github.com/diplodoc-platform/mdx-extension/commit/a6b9ce756badcb0551e3308f6bd3c8f1acdfea0c))
+
 ## [1.6.4](https://github.com/diplodoc-platform/mdx-extension/compare/v1.6.3...v1.6.4) (2025-10-03)
 
 

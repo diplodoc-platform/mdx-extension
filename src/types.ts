@@ -1,12 +1,10 @@
 import React from 'react';
 import type {MdxStateCtxValue} from './context';
-import type {MDXProps} from 'mdx/types';
 
 export type {WithInitialProps} from './utils/withInitialProps';
 
 export interface MdxArtifacts {
     idMdx: Record<string, string>;
-    idMdxComponent?: Record<string, React.ComponentType<MDXProps>>;
     idTagName: Record<string, string>;
 }
 

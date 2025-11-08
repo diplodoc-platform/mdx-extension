@@ -32,7 +32,10 @@ const useMdxSsr = ({
     );
 
     // building mdx scripts into components
-    const idMdxComponent = useMemo(() => idMdxToComponents(mdxArtifacts ?? {}), [mdxArtifacts]);
+    const idMdxComponent = useMemo(
+        () => idMdxToComponents(mdxArtifacts?.idMdx),
+        [mdxArtifacts?.idMdx],
+    );
 
     const idTagName = useMemo(() => mdxArtifacts?.idTagName ?? {}, [mdxArtifacts]);
 

@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useMemo, useRef} from 'react';
-import type {ContextList, MdxArtifacts} from '../types';
+import type {ContextList, CustomRunSync, MdxArtifacts} from '../types';
 import {idMdxToComponents, renderMdxComponents} from '../utils/internal/common';
 import type {MDXComponents} from 'mdx/types';
 import usePortals from './internal/usePortals';
@@ -7,11 +7,12 @@ import useContextProxy from './internal/useContextProxy';
 
 export interface UseMdxSsrProps {
     html: string;
-    refCtr: React.MutableRefObject<HTMLElement | null>;
+    refCtr: React.RefObject<HTMLElement | null>;
     components?: MDXComponents;
     pureComponents?: MDXComponents;
     mdxArtifacts?: MdxArtifacts;
     contextList?: ContextList;
+    customRunSync?: CustomRunSync;
 }
 
 const useMdxSsr = ({
@@ -21,6 +22,7 @@ const useMdxSsr = ({
     components,
     pureComponents,
     contextList,
+    customRunSync,
 }: UseMdxSsrProps) => {
     const refUmount = useRef(() => {});
 
@@ -33,8 +35,8 @@ const useMdxSsr = ({
 
     // building mdx scripts into components
     const idMdxComponent = useMemo(
-        () => idMdxToComponents(mdxArtifacts?.idMdx),
-        [mdxArtifacts?.idMdx],
+        () => idMdxToComponents(mdxArtifacts?.idMdx, customRunSync),
+        [mdxArtifacts?.idMdx, customRunSync],
     );
 
     const idTagName = useMemo(() => mdxArtifacts?.idTagName ?? {}, [mdxArtifacts]);

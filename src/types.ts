@@ -1,5 +1,7 @@
 import React from 'react';
 import type {MdxStateCtxValue} from './context';
+import runtime from 'react/jsx-runtime';
+import type {MDXProps} from 'mdx/types';
 
 export type {WithInitialProps} from './utils/withInitialProps';
 
@@ -31,3 +33,9 @@ export type ContextWithValue<T> = {
 };
 
 export type ContextList = (ReactContextLike<unknown> | ContextWithValue<unknown>)[];
+
+export type CustomRunSync = (
+    code: string,
+    options: typeof runtime,
+    artifactId: string,
+) => React.ComponentType<MDXProps>;

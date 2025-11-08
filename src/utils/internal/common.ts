@@ -8,7 +8,13 @@ import {
     MdxPortalSetterCtx,
 } from '../../context/internal/MdxPortalSetterCtx';
 import {portalWrapperComponentMap} from './maps';
-import type {ContextList, ContextWithValue, MdxArtifacts, ReactContextLike} from '../../types';
+import type {
+    ContextList,
+    ContextWithValue,
+    CustomRunSync,
+    MdxArtifacts,
+    ReactContextLike,
+} from '../../types';
 import CtxProxy from '../../components/internal/CtxProxy';
 import type {ListenCtxFn} from '../../hooks/internal/useContextProxy';
 
@@ -121,11 +127,16 @@ export const renderMdxComponents = ({
     return () => unmountFns.forEach((cb) => cb());
 };
 
-export const idMdxToComponents = (idMdx?: Record<string, string>) => {
+export const idMdxToComponents = (
+    idMdx?: Record<string, string>,
+    customRunSync?: CustomRunSync,
+) => {
     return Object.entries(idMdx ?? {}).reduce<Record<string, React.ComponentType<MDXProps>>>(
         (acc, [id, fnStr]) => {
             // eslint-disable-next-line no-param-reassign
-            acc[id] = runSync(fnStr, runtime).default;
+            acc[id] = customRunSync
+                ? customRunSync(fnStr, runtime, id)
+                : runSync(fnStr, runtime).default;
             return acc;
         },
         {},

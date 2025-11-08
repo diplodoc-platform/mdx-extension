@@ -1,10 +1,16 @@
 const HANDLERS_KEY = '__mdxLoader__';
 
-export function executeCodeWithPromise<T>(id: string, code: string, nonce?: string) {
+export function executeCodeWithPromise<T>(code: string, nonce?: string) {
+    // @ts-ignore
+    const headers = (window[HANDLERS_KEY] = window[HANDLERS_KEY] || {});
+
+    let id;
+    do {
+        id = Math.random().toString(36).substring(2);
+    } while (headers[id]);
+
     return new Promise<T>((resolve, reject) => {
-        // @ts-ignore
-        const handlers = (window[HANDLERS_KEY] = window[HANDLERS_KEY] || {});
-        handlers[id] = {resolve, reject};
+        headers[id] = {resolve, reject};
 
         const wrappedCode = `(function(handlers) {
     try {

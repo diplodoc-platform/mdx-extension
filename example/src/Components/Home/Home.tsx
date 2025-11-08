@@ -11,9 +11,10 @@ import {executeCodeWithPromise} from '@/utils/utils';
 interface HomeProps {
     html: string;
     mdxArtifacts?: MdxArtifacts;
+    withLoader?: boolean;
 }
 
-const Home: FC<HomeProps> = ({html, mdxArtifacts}) => {
+const Home: FC<HomeProps> = ({html, mdxArtifacts, withLoader}) => {
     const refYfm = useRef<HTMLDivElement>(null);
     const [isSuccess, setSuccess] = React.useState(false);
     const [data, setData] = React.useState<IdMdxComponentLoader['data']>(undefined);
@@ -25,7 +26,7 @@ const Home: FC<HomeProps> = ({html, mdxArtifacts}) => {
         contextList: CONTEXT_LIST,
         mdxArtifacts,
         html,
-        idMdxComponentLoader: {isSuccess, data},
+        idMdxComponentLoader: withLoader ? {isSuccess, data} : undefined,
     });
 
     const innerHtml = React.useMemo(() => {
@@ -33,14 +34,12 @@ const Home: FC<HomeProps> = ({html, mdxArtifacts}) => {
     }, [html]);
 
     useEffect(() => {
+        if (!withLoader) return;
         (async () => {
             const idMdxComponent: Record<string, React.ComponentType<MDXProps>> = {};
 
             for (const [artifactId, code] of Object.entries(mdxArtifacts?.idMdx ?? {})) {
-                const fn = await executeCodeWithPromise<(r: typeof runtime) => MDXModule>(
-                    artifactId,
-                    code,
-                );
+                const fn = await executeCodeWithPromise<(r: typeof runtime) => MDXModule>(code);
                 idMdxComponent[artifactId] = fn(runtime).default;
             }
 

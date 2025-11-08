@@ -1,9 +1,12 @@
 'use client';
-import React, {FC, Fragment, useRef} from 'react';
+import React, {FC, Fragment, useEffect, useRef} from 'react';
 import '@diplodoc/transform/dist/css/yfm.css';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {MdxArtifacts, useMdxSsr} from '@plugin';
+import {type IdMdxComponentLoader, MdxArtifacts, useMdxSsr} from '@plugin';
 import {COMPONENTS, CONTEXT_LIST, PURE_COMPONENTS} from '@/components';
+import {run} from '@mdx-js/mdx';
+import * as runtime from 'react/jsx-runtime';
+import {MDXProps} from 'mdx/types';
 
 interface HomeProps {
     html: string;
@@ -12,6 +15,8 @@ interface HomeProps {
 
 const Home: FC<HomeProps> = ({html, mdxArtifacts}) => {
     const refYfm = useRef<HTMLDivElement>(null);
+    const [isSuccess, setSuccess] = React.useState(false);
+    const [data, setData] = React.useState<IdMdxComponentLoader['data']>(undefined);
 
     const portalsNode = useMdxSsr({
         refCtr: refYfm,
@@ -20,11 +25,25 @@ const Home: FC<HomeProps> = ({html, mdxArtifacts}) => {
         contextList: CONTEXT_LIST,
         mdxArtifacts,
         html,
+        idMdxComponentLoader: {isSuccess, data},
     });
 
     const innerHtml = React.useMemo(() => {
         return {__html: html};
     }, [html]);
+
+    useEffect(() => {
+        (async () => {
+            const idMdxComponent: Record<string, React.ComponentType<MDXProps>> = {};
+
+            for (const [artifactId, component] of Object.entries(mdxArtifacts?.idMdx ?? {})) {
+                idMdxComponent[artifactId] = (await run(component, runtime)).default;
+            }
+
+            setData(idMdxComponent);
+            setSuccess(true);
+        })();
+    }, [mdxArtifacts]);
 
     return (
         <Fragment>

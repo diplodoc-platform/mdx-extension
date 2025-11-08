@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useMemo, useRef} from 'react';
-import type {ContextList, MdxArtifacts} from '../types';
+import type {ContextList, IdMdxComponentLoader, MdxArtifacts} from '../types';
 import {idMdxToComponents, renderMdxComponents} from '../utils/internal/common';
 import type {MDXComponents} from 'mdx/types';
 import usePortals from './internal/usePortals';
@@ -12,6 +12,7 @@ export interface UseMdxProps {
     pureComponents?: MDXComponents;
     mdxArtifacts?: MdxArtifacts;
     contextList?: ContextList;
+    idMdxComponentLoader?: IdMdxComponentLoader;
 }
 
 const useMdx = ({
@@ -21,6 +22,7 @@ const useMdx = ({
     pureComponents,
     mdxArtifacts,
     contextList,
+    idMdxComponentLoader,
 }: UseMdxProps) => {
     const refUmount = useRef(() => {});
 
@@ -33,8 +35,11 @@ const useMdx = ({
 
     // building mdx scripts into components
     const idMdxComponent = useMemo(
-        () => idMdxToComponents(mdxArtifacts?.idMdx),
-        [mdxArtifacts?.idMdx],
+        () =>
+            idMdxComponentLoader
+                ? idMdxComponentLoader.data
+                : idMdxToComponents(mdxArtifacts?.idMdx),
+        [mdxArtifacts?.idMdx, idMdxComponentLoader?.data],
     );
 
     const idTagName = useMemo(() => mdxArtifacts?.idTagName ?? {}, [mdxArtifacts]);
@@ -70,9 +75,17 @@ const useMdx = ({
 
     // render mdx
     useLayoutEffect(() => {
+        if (idMdxComponentLoader && !idMdxComponentLoader.isSuccess) {
+            return;
+        }
+
         const ctr = refCtr.current;
         if (!ctr) {
             throw new Error('ctr is null');
+        }
+
+        if (!idMdxComponent) {
+            throw new Error('idMdxComponent is null');
         }
 
         refUmount.current = renderMdxComponents({
@@ -93,6 +106,7 @@ const useMdx = ({
         setPortal,
         getCtxEmitterRef,
         contextList,
+        idMdxComponentLoader?.isSuccess,
     ]);
 
     return React.createElement(React.Fragment, null, portalsNode, listenerNode);

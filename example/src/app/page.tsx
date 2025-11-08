@@ -21,5 +21,5 @@ const getContent = async () => {
 export default async function Page() {
     const {html, mdxArtifacts} = await getContent();
 
-    return <Home html={html} mdxArtifacts={mdxArtifacts} />;
+    return <Home html={html} mdxArtifacts={mdxArtifacts} withLoader />;
 }

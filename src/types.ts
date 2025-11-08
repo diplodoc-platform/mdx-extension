@@ -1,5 +1,6 @@
 import React from 'react';
 import type {MdxStateCtxValue} from './context';
+import type {MDXProps} from 'mdx/types';
 
 export type {WithInitialProps} from './utils/withInitialProps';
 
@@ -31,3 +32,8 @@ export type ContextWithValue<T> = {
 };
 
 export type ContextList = (ReactContextLike<unknown> | ContextWithValue<unknown>)[];
+
+export interface IdMdxComponentLoader {
+    data?: Record<string, React.ComponentType<MDXProps>>;
+    isSuccess?: boolean;
+}

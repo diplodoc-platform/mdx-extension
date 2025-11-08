@@ -453,7 +453,7 @@ export const PURE_COMPONENTS = {
 
 ### Asynchronous Component Loading
 
-The `useMdx` and `useMdxSsr` hooks now support an optional `idMdxComponentLoader` parameter that enables asynchronous loading of MDX components:
+The `useMdx` and `useMdxSsr` hooks support an optional `idMdxComponentLoader` parameter that enables asynchronous loading of MDX components:
 
 ```tsx
 interface PageProps {
@@ -491,7 +491,7 @@ const Page: FC<PageProps> = ({html, mdxArtifacts}) => {
 
 ### Compilation Options
 
-All renderer functions (`getSsrRenderer`, `getAsyncSsrRenderer`, `getRenderer`) now accept optional MDX compilation options:
+All renderer functions (`getSsrRenderer`, `getAsyncSsrRenderer`, `getRenderer`) accept optional MDX compilation options:
 
 ```typescript
 const renderer = await getAsyncSsrRenderer({

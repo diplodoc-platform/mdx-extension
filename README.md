@@ -22,9 +22,9 @@ yarn add @diplodoc/mdx-extension
   - Explicit `<MDX>...</MDX>` tags
   - Short form JSX fragments `<>...</>`
   - Direct React component usage `<Component />`
-  - Built-in security with MDX input validation
-  - Portal support for advanced component mounting with `withPortal`
-  - Asynchronous component loading support via `idMdxComponentLoader`
+- Built-in security with MDX input validation
+- Portal support for advanced component mounting with `withPortal`
+- Asynchronous component loading support via `idMdxComponentLoader`
 
 ## Usage
 

@@ -4,9 +4,9 @@ import '@diplodoc/transform/dist/css/yfm.css';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {type IdMdxComponentLoader, MdxArtifacts, useMdxSsr} from '@plugin';
 import {COMPONENTS, CONTEXT_LIST, PURE_COMPONENTS} from '@/components';
-import {run} from '@mdx-js/mdx';
+import {MDXModule, MDXProps} from 'mdx/types';
 import * as runtime from 'react/jsx-runtime';
-import {MDXProps} from 'mdx/types';
+import {executeCodeWithPromise} from '@/utils/utils';
 
 interface HomeProps {
     html: string;
@@ -36,8 +36,12 @@ const Home: FC<HomeProps> = ({html, mdxArtifacts}) => {
         (async () => {
             const idMdxComponent: Record<string, React.ComponentType<MDXProps>> = {};
 
-            for (const [artifactId, component] of Object.entries(mdxArtifacts?.idMdx ?? {})) {
-                idMdxComponent[artifactId] = (await run(component, runtime)).default;
+            for (const [artifactId, code] of Object.entries(mdxArtifacts?.idMdx ?? {})) {
+                const fn = await executeCodeWithPromise<(r: typeof runtime) => MDXModule>(
+                    artifactId,
+                    code,
+                );
+                idMdxComponent[artifactId] = fn(runtime).default;
             }
 
             setData(idMdxComponent);

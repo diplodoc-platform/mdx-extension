@@ -30,12 +30,11 @@ const mdxPlugin = (options?: Options) => {
     const {render = getRender(), isTestMode = false, tagNames} = options ?? {};
 
     const transform: MarkdownItPluginCb<MdxPluginEnv> = (md) => {
+        let index = 0;
         const idMdxBody: Record<string, MdxBody> = {};
         const iTagLen = InternalTagName.length + 2;
 
         const corePlugin: RuleCore = (state) => {
-            let index = 0;
-
             // eslint-disable-next-line no-param-reassign
             state.src = replaceBlocks({
                 content: state.src,

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.2](https://github.com/diplodoc-platform/mdx-extension/compare/v1.7.1...v1.7.2) (2026-04-14)
+
+
+### Bug Fixes
+
+* split async ssr renderer ([#72](https://github.com/diplodoc-platform/mdx-extension/issues/72)) ([5c29278](https://github.com/diplodoc-platform/mdx-extension/commit/5c2927859822d8bc9b7f8ef8e93dcfc89743156b))
+
 ## [1.7.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.7.0...v1.7.1) (2026-01-27)
 
 

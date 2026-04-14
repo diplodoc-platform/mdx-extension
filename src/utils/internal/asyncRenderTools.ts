@@ -4,7 +4,7 @@ import * as runtime from 'react/jsx-runtime';
 import {componentGetInitProps, portalWrapperComponentMap} from './maps';
 
 const getInitPropsFn = (component: React.ElementType) => {
-    if (!component || typeof component !== 'object') return;
+    if (!component || typeof component !== 'object') return undefined;
     const origComponent = portalWrapperComponentMap.get(component);
     const initFn =
         componentGetInitProps.get(component) ??

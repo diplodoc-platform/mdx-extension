@@ -3,4 +3,5 @@ export {default as getSsrRenderer, type GetSsrRendererProps} from './getSsrRende
 export {default as getAsyncSsrRenderer, type GetAsyncSsrRendererProps} from './getAsyncSsrRenderer';
 export {default as withInitialProps, type WithInitialProps} from './withInitialProps';
 export {default as withPortal, type WithPortal} from './withPortal';
+export {default as getAsyncSsrPlaceholderRenderer} from './getAsyncSsrPlaceholderRenderer';
 export * from './common';

@@ -2,18 +2,12 @@ import type {MDXComponents} from 'mdx/types';
 import {type CompileOptions, type RunOptions, compile, run} from '@mdx-js/mdx';
 import React from 'react';
 import type {ContextList, MdxArtifacts} from '../types';
-import {MDX_PREFIX, TAG_NAME} from '../constants';
+import {TAG_NAME} from '../constants';
 import {renderToString} from 'react-dom/server';
-import {
-    generateUniqueId,
-    getCtxFromCtxItem,
-    getInitMdxArtifacts,
-    isPortal,
-} from './internal/common';
+import {getCtxFromCtxItem, getInitMdxArtifacts, isPortal} from './internal/common';
 import {MdxSetStateCtx, MdxStateCtx, type MdxStateCtxValue} from '../context';
 import {MdxPortalSetterCtx} from '../context/internal/MdxPortalSetterCtx';
 import {AsyncComponentWrapper, getMdxRuntimeWithHook} from './internal/asyncRenderTools';
-import type {GetHtmlProps} from './internal/types';
 import {
     escapeAttribute,
     isEmptyObject,
@@ -21,6 +15,7 @@ import {
     trimPortalTag,
     wrapObject,
 } from './internal/ssr';
+import getAsyncSsrPlaceholderRenderer from './getAsyncSsrPlaceholderRenderer';
 
 export interface GetAsyncSsrRendererProps {
     components?: MDXComponents;
@@ -119,15 +114,15 @@ const getAsyncSsrRenderer = ({
         return {html, code};
     };
 
-    const idFragment = new Map<string, {replacer: string; mdx: string; tagName: string}>();
+    const getHtml = getAsyncSsrPlaceholderRenderer();
 
     const getHtmlAsync = async (inputOrig: string, mdxArtifacts?: MdxArtifacts) => {
         let input = inputOrig;
-        const {idMdx, idTagName} = mdxArtifacts ?? getInitMdxArtifacts();
+        const {idMdx, idTagName, idFragment = []} = mdxArtifacts ?? getInitMdxArtifacts();
 
         const items: {id: string; replacer: string; tagName: string}[] = [];
         const promises: ReturnType<typeof render>[] = [];
-        idFragment.forEach(({replacer, mdx, tagName}, id) => {
+        idFragment.splice(0).forEach(({id, replacer, mdx, tagName}) => {
             promises.push(render(id, mdx, tagName));
             items.push({id, replacer, tagName});
         });
@@ -143,16 +138,11 @@ const getAsyncSsrRenderer = ({
             }
         }
 
+        if (mdxArtifacts) {
+            mdxArtifacts.idFragment = undefined;
+        }
+
         return input;
-    };
-
-    let idx = 0;
-
-    const getHtml = ({mdx, tagName}: GetHtmlProps) => {
-        const id = `${MDX_PREFIX}${++idx}`;
-        const replacer = `<${TAG_NAME} class="${id}">${generateUniqueId()}</${TAG_NAME}>`;
-        idFragment.set(id, {replacer, mdx, tagName});
-        return replacer;
     };
 
     return {render: getHtml, renderAsync: getHtmlAsync};

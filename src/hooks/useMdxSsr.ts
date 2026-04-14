@@ -1,9 +1,10 @@
 import React, {useLayoutEffect, useMemo, useRef} from 'react';
 import type {ContextList, IdMdxComponentLoader, MdxArtifacts} from '../types';
-import {idMdxToComponents, renderMdxComponents} from '../utils/internal/common';
+import {idMdxToComponents} from '../utils/internal/common';
 import type {MDXComponents} from 'mdx/types';
 import usePortals from './internal/usePortals';
 import useContextProxy from './internal/useContextProxy';
+import {renderMdxComponents} from '../utils/internal/render';
 
 export interface UseMdxSsrProps {
     html: string;

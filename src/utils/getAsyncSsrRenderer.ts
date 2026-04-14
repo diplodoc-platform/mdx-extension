@@ -139,7 +139,7 @@ const getAsyncSsrRenderer = ({
         }
 
         if (mdxArtifacts) {
-            mdxArtifacts.idFragment = undefined;
+            delete mdxArtifacts.idFragment;
         }
 
         return input;

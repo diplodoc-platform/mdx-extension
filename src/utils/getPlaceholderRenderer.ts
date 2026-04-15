@@ -2,7 +2,7 @@ import type {GetHtmlProps} from './internal/types';
 import {MDX_PREFIX, TAG_NAME} from '../constants';
 import {generateUniqueId} from './internal/common';
 
-function getAsyncSsrPlaceholderRenderer() {
+function getPlaceholderRenderer() {
     let idx = 0;
 
     const getHtml = ({mdx, tagName, mdxArtifacts}: GetHtmlProps) => {
@@ -20,4 +20,4 @@ function getAsyncSsrPlaceholderRenderer() {
     return getHtml;
 }
 
-export default getAsyncSsrPlaceholderRenderer;
+export default getPlaceholderRenderer;

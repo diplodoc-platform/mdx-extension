@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.7.2...v1.8.0) (2026-04-15)
+
+
+### Features
+
+* add placeholder renderer ([#77](https://github.com/diplodoc-platform/mdx-extension/issues/77)) ([fbd65a7](https://github.com/diplodoc-platform/mdx-extension/commit/fbd65a70e2477c3a8ee13071e6d8a85207dcd863))
+
 ## [1.7.2](https://github.com/diplodoc-platform/mdx-extension/compare/v1.7.1...v1.7.2) (2026-04-14)
 
 

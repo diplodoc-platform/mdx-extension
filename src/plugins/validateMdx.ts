@@ -195,7 +195,12 @@ function validateAST(ast: Program): void {
         if (['dangerouslySetInnerHTML', 'ref'].includes(name) || /^on[A-Z]/.test(name)) {
             throw new Error(`Component prop '${name}' is not allowed`);
         }
-
+        if (['href', 'src', 'action'].includes(name) && node.value.type === 'Literal') {
+            const value = String(node.value.value).trim().toLowerCase();
+            if (value.startsWith('javascript:') || value.startsWith('data:text/html')) {
+                throw new Error(`Unsafe URL protocol in prop '${name}'`);
+            }
+        }
         checkJsxPropValue(node.value);
         return;
     }

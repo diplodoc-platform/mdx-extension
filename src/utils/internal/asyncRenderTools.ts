@@ -3,11 +3,11 @@ import type {MdxStateCtxValue} from '../../context';
 import * as runtime from 'react/jsx-runtime';
 import {componentGetInitProps, portalWrapperComponentMap} from './maps';
 
-const getInitPropsFn = (component: React.ElementType) => {
-    if (!component || typeof component !== 'object') return undefined;
-    const origComponent = portalWrapperComponentMap.get(component);
+const getInitPropsFn = (component: React.ElementType | React.Component) => {
+    if (!component || !['object', 'function'].includes(typeof component)) return undefined;
+    const origComponent = portalWrapperComponentMap.get(component as React.ComponentType);
     const initFn =
-        componentGetInitProps.get(component) ??
+        componentGetInitProps.get(component as React.ComponentType) ??
         (origComponent && componentGetInitProps.get(origComponent));
     return initFn;
 };

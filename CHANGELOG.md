@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.8.0...v1.8.1) (2026-04-30)
+
+
+### Bug Fixes
+
+* getInitPropsFn ([040872b](https://github.com/diplodoc-platform/mdx-extension/commit/040872b75879ca6b6ae9bf1db3cf2760bf68efdc))
+
 ## [1.8.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.7.2...v1.8.0) (2026-04-15)
 
 

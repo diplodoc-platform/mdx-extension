@@ -201,6 +201,7 @@ function validateAST(ast: Program): void {
                 throw new Error(`Unsafe URL protocol in prop '${name}'`);
             }
         }
+        
         checkJsxPropValue(node.value);
         return;
     }

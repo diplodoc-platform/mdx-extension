@@ -197,11 +197,12 @@ function validateAST(ast: Program): void {
         }
         if (['href', 'src', 'action'].includes(name) && node.value.type === 'Literal') {
             const value = String(node.value.value).trim().toLowerCase();
+            // eslint-disable-next-line no-script-url
             if (value.startsWith('javascript:') || value.startsWith('data:text/html')) {
                 throw new Error(`Unsafe URL protocol in prop '${name}'`);
             }
         }
-        
+
         checkJsxPropValue(node.value);
         return;
     }

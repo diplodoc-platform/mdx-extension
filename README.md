@@ -79,6 +79,7 @@ The `validateMdx` plugin performs comprehensive security validation by:
    - `dangerouslySetInnerHTML`
    - `ref`
    - Event handlers (props starting with `on[A-Z]`)
+   - Unsafe URL protocols in `href`, `src`, `action` props (blocks `javascript:` and `data:text/html`)
 
 3. **Limiting component types** to only:
    - Built-in MDX components (`_Fragment`, `MDXLayout`, `_createMdxContent`)
@@ -95,7 +96,7 @@ The `validateMdx` plugin performs comprehensive security validation by:
    - Logical expressions (only specific patterns)
    - Async/await, yield, assignment, import, and function expressions
 
-5. **Enforcing depth limits** to prevent overly complex ASTs
+5. **Enforcing depth limits** (max depth 50) to prevent overly complex ASTs
 
 #### Why Use This Plugin?
 
@@ -107,6 +108,7 @@ The `validateMdx` plugin performs comprehensive security validation by:
 #### Validation Errors
 
 When the plugin detects invalid patterns, it throws descriptive errors such as:
+
 - "Component prop 'dangerouslySetInnerHTML' is not allowed"
 - "Component tag type '...' is not allowed here"
 - "FunctionDeclaration is not allowed here"
@@ -338,7 +340,7 @@ const processor = unified()
   .use(remarkParse)
   .use(remarkMdx)
   .use(remarkRawMdxContent, {
-    tagNames: ['CodeExample', 'RawContent'] // Specify which tags to process
+    tagNames: ['CodeExample', 'RawContent'], // Specify which tags to process
   });
 
 const tree = processor.parse(`# Example
@@ -364,8 +366,8 @@ const result = transform(content, {
     ...DefaultPlugins,
     mdxPlugin({
       compileOptions: {
-        remarkPlugins: [[remarkRawMdxContent, {tagNames: ['CodeExample']}]]
-      }
+        remarkPlugins: [[remarkRawMdxContent, {tagNames: ['CodeExample']}]],
+      },
     }),
   ],
 });

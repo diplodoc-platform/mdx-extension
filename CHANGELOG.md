@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.8.1...v1.9.0) (2026-05-04)
+
+
+### Features
+
+* add attr value check ([#80](https://github.com/diplodoc-platform/mdx-extension/issues/80)) ([b0fb638](https://github.com/diplodoc-platform/mdx-extension/commit/b0fb6385b29fc29fb0fe08a61f33630a7092b637))
+* remark raw mdx content plugin ([#81](https://github.com/diplodoc-platform/mdx-extension/issues/81)) ([d12c7e8](https://github.com/diplodoc-platform/mdx-extension/commit/d12c7e853ac1cde49c71757086774df96e444468))
+
 ## [1.8.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.8.0...v1.8.1) (2026-04-30)
 
 

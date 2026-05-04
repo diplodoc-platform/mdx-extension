@@ -44,7 +44,9 @@ const result = transform(markdownContent, {
 
 ### Enabling MDX Input Validation
 
-To enable security validation of MDX input and prevent execution of potentially unsafe code:
+The `validateMdx` plugin is a **recma plugin** (Rehype Compatible MDAST to JavaScript AST compiler) that validates MDX content for security by analyzing the generated Abstract Syntax Tree (AST). It prevents execution of potentially unsafe code by restricting allowed JavaScript constructs and patterns.
+
+To enable security validation of MDX input:
 
 ```typescript
 import {mdxPlugin, validateMdx} from '@diplodoc/mdx-extension';
@@ -61,11 +63,54 @@ const result = transform(markdownContent, {
 });
 ```
 
-This will:
+#### What the Plugin Validates
 
-- Validate all user-provided MDX/JSX content
-- Prevent execution of unsafe code on the server
-- Throw validation errors for suspicious patterns
+The `validateMdx` plugin performs comprehensive security validation by:
+
+1. **Restricting JSX prop values** to only allow:
+   - Literals (strings, numbers, booleans)
+   - Identifiers
+   - Array expressions (with validated elements)
+   - Object expressions (with validated properties)
+   - Binary expressions (with validated operands)
+   - Specific JSX calls (`_jsxs`, `_jsx`)
+
+2. **Blocking dangerous props** including:
+   - `dangerouslySetInnerHTML`
+   - `ref`
+   - Event handlers (props starting with `on[A-Z]`)
+
+3. **Limiting component types** to only:
+   - Built-in MDX components (`_Fragment`, `MDXLayout`, `_createMdxContent`)
+   - Components from the `_components` object
+   - Literal component names
+
+4. **Disallowing unsafe JavaScript constructs**:
+   - Function declarations (except specific MDX functions)
+   - Variable declarations (except specific patterns)
+   - Member expressions (except specific patterns)
+   - Call expressions (except specific functions)
+   - New expressions (only `Error` allowed)
+   - Spread elements (only specific patterns)
+   - Logical expressions (only specific patterns)
+   - Async/await, yield, assignment, import, and function expressions
+
+5. **Enforcing depth limits** to prevent overly complex ASTs
+
+#### Why Use This Plugin?
+
+- **Security**: Prevents execution of arbitrary JavaScript code in MDX content
+- **Server-side protection**: Blocks unsafe code that could execute during SSR
+- **Controlled environment**: Ensures only approved patterns are allowed
+- **Early error detection**: Throws validation errors for suspicious patterns before execution
+
+#### Validation Errors
+
+When the plugin detects invalid patterns, it throws descriptive errors such as:
+- "Component prop 'dangerouslySetInnerHTML' is not allowed"
+- "Component tag type '...' is not allowed here"
+- "FunctionDeclaration is not allowed here"
+- "Max depth exceeded"
 
 ### Client-side Rendering (CSR)
 
@@ -220,6 +265,113 @@ const asyncPlugin = getAsyncMdxCollectPlugin({
 
 const transformedContent = await asyncPlugin(originalContent);
 ```
+
+## Placeholder Renderer
+
+The placeholder renderer provides a two-phase rendering approach for MDX content. This is useful for scenarios where you need to separate parsing from execution, such as deferred rendering, SSR with async components, or when you want to process MDX content in multiple passes.
+
+### How it works
+
+1. **Placeholder Generation**: During initial MDX processing, the `getPlaceholderRenderer` function creates placeholder HTML elements with unique IDs and stores the original MDX content in `mdxArtifacts.idFragment`.
+
+2. **Placeholder Rendering**: Later, the `createPlaceholderRender` or `createAsyncPlaceholderRender` functions process these placeholders, replacing them with actual rendered HTML and storing the compiled code in `idMdx` and `idTagName` for client-side hydration.
+
+### Usage
+
+```typescript
+import {getPlaceholderRenderer, createPlaceholderRender} from '@diplodoc/mdx-extension';
+
+// Create a placeholder renderer
+const placeholderRenderer = getPlaceholderRenderer();
+
+// Use it in mdxPlugin
+const {result} = transform(content, {
+  plugins: [
+    ...DefaultPlugins,
+    mdxPlugin({
+      render: placeholderRenderer,
+    }),
+  ],
+});
+
+// Later, render the placeholders
+const render = createPlaceholderRender({
+  components: YOUR_COMPONENTS,
+  // ... other options
+});
+
+const finalHtml = render(result.html, result.mdxArtifacts);
+```
+
+### Async Placeholder Rendering
+
+For asynchronous rendering (e.g., with components that have `withInitialProps`), use the async version:
+
+```typescript
+import {createAsyncPlaceholderRender} from '@diplodoc/mdx-extension';
+
+const asyncRender = createAsyncPlaceholderRender({
+  components: YOUR_COMPONENTS,
+  // ... other options
+});
+
+const finalHtml = await asyncRender(result.html, result.mdxArtifacts);
+```
+
+## Raw MDX Content Plugin
+
+The `remarkRawMdxContent` plugin is a remark plugin that extracts raw MDX content inside specified components and preserves it as text, preventing it from being parsed as MDX. This is useful for components that need to output raw MDX/JSX as text content (e.g., code examples, documentation generators).
+
+### How it works
+
+The plugin processes MDX JSX elements and for specified tag names, extracts the raw text content between the opening and closing tags. It then replaces the children with a single text node containing that raw content, preserving the original formatting.
+
+### Usage
+
+```typescript
+import {remarkRawMdxContent} from '@diplodoc/mdx-extension';
+import {unified} from 'unified';
+import remarkParse from 'remark-parse';
+import remarkMdx from 'remark-mdx';
+
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkMdx)
+  .use(remarkRawMdxContent, {
+    tagNames: ['CodeExample', 'RawContent'] // Specify which tags to process
+  });
+
+const tree = processor.parse(`# Example
+
+<CodeExample>
+  <Button>Click me</Button>
+</CodeExample>`);
+
+const transformedTree = processor.runSync(tree);
+```
+
+### Integration with Diplodoc Transform
+
+You can use the plugin as part of your Diplodoc transform pipeline:
+
+```typescript
+import transform from '@diplodoc/transform';
+import DefaultPlugins from '@diplodoc/transform/lib/plugins';
+import {mdxPlugin, remarkRawMdxContent} from '@diplodoc/mdx-extension';
+
+const result = transform(content, {
+  plugins: [
+    ...DefaultPlugins,
+    mdxPlugin({
+      compileOptions: {
+        remarkPlugins: [[remarkRawMdxContent, {tagNames: ['CodeExample']}]]
+      }
+    }),
+  ],
+});
+```
+
+This will ensure that content inside `<CodeExample>` tags is preserved as raw text rather than being parsed as MDX.
 
 ## API Reference
 

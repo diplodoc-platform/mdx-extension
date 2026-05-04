@@ -10,6 +10,7 @@ import {getInitialProps} from '@/Components/Counter/getInitialProps';
 import React from 'react';
 import ThemeToggle from '@/Components/ThemeToggle/ThemeToggle';
 import {SetThemeCtx} from '@/hooks/SetThemeCtx';
+import RawContent from './Components/RawContent/RawContent';
 
 export const COMPONENTS = {
     Button,
@@ -30,6 +31,7 @@ export const PURE_COMPONENTS = {
     Label,
     CompatTable,
     Alert,
+    RawContent,
 };
 
 export const CONTEXT_LIST: ContextList = [

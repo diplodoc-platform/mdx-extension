@@ -5,7 +5,9 @@ export interface Options {
     componentName?: string;
 }
 
-export default function recmaDefaultComponent(options?: Options) {
+export const recmaDefaultComponent: (options?: Options) => Transformer<Program> = (
+    options?: Options,
+) => {
     const {componentName = 'DefaultComponent'} = options || {};
 
     const transformer: Transformer<Program> = (tree) => {
@@ -94,4 +96,4 @@ export default function recmaDefaultComponent(options?: Options) {
     };
 
     return transformer;
-}
+};

@@ -1,5 +1,5 @@
 import type {Transformer} from 'unified';
-import type {IfStatement, Program, ReturnStatement} from 'estree';
+import type {BaseNode, IfStatement, Program, ReturnStatement} from 'estree';
 
 export interface Options {
     componentName?: string;
@@ -9,7 +9,7 @@ export default function recmaDefaultComponent(options: Options) {
     const {componentName = 'DefaultComponent'} = options;
 
     const transformer: Transformer<Program> = (tree) => {
-        function walk(node: any) {
+        function walk(node: BaseNode) {
             if (!node || typeof node !== 'object') return;
 
             if (node.type === 'IfStatement') {
@@ -84,7 +84,7 @@ export default function recmaDefaultComponent(options: Options) {
             } else {
                 for (const key in node) {
                     if (Object.prototype.hasOwnProperty.call(node, key)) {
-                        walk(node[key]);
+                        walk(node[key as keyof typeof node] as unknown as BaseNode);
                     }
                 }
             }

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.10.0...v1.10.1) (2026-06-17)
+
+
+### Bug Fixes
+
+* recma default component export ([#86](https://github.com/diplodoc-platform/mdx-extension/issues/86)) ([4b34031](https://github.com/diplodoc-platform/mdx-extension/commit/4b34031a97a767ca26f44ee2bd289114491acb56))
+
 ## [1.10.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.9.0...v1.10.0) (2026-06-17)
 
 

@@ -11,6 +11,7 @@ import React from 'react';
 import ThemeToggle from '@/Components/ThemeToggle/ThemeToggle';
 import {SetThemeCtx} from '@/hooks/SetThemeCtx';
 import RawContent from './Components/RawContent/RawContent';
+import NotFound from '@/Components/NotFound/NotFound';
 
 export const COMPONENTS = {
     Button,
@@ -32,6 +33,7 @@ export const PURE_COMPONENTS = {
     CompatTable,
     Alert,
     RawContent,
+    NotFound,
 };
 
 export const CONTEXT_LIST: ContextList = [

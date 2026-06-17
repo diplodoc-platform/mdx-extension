@@ -1,4 +1,4 @@
-import {type RunOptions, compile, run} from '@mdx-js/mdx';
+import {compile, run, type RunOptions} from '@mdx-js/mdx';
 import React from 'react';
 import {TAG_NAME} from '../../constants';
 import {renderToString} from 'react-dom/server';

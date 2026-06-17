@@ -67,9 +67,7 @@ Example default component:
 ```tsx
 const Components = {
   DefaultComponent: ({tagName, ...props}) => (
-    <div style={{border: '1px dashed red'}}>
-      Missing component: {tagName}
-    </div>
+    <div style={{border: '1px dashed red'}}>Missing component: {tagName}</div>
   ),
 };
 ```

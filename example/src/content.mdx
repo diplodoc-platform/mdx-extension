@@ -21,7 +21,6 @@ Renders:
 ```markdown
 <Button
   view="normal"
-  onClick={() => alert('Clicked!')}
 >
   Click Me
 </Button>
@@ -29,7 +28,7 @@ Renders:
 
 Renders:
 
-<Button view="normal" onClick={() => alert('Clicked!')}>Click Me</Button>
+<Button view="normal">Click Me</Button>
 
 ## MDX Syntax Variations
 
@@ -46,7 +45,7 @@ Renders:
 Renders:
 
 <MDX>
-    <div style={{color: 'red', padding: '1rem'}}>This content is wrapped in explicit MDX tags</div>
+    <div>This content is wrapped in explicit MDX tags</div>
 </MDX>
 
 ### 2. JSX Fragment Shortcut
@@ -188,6 +187,16 @@ Renders:
 <RawContent>
 This is **not bold** text
 </RawContent>
+
+### Not found component
+
+```markdown
+<Test/>
+```
+
+Renders:
+
+<Test/>
 
 ## Limitations
 

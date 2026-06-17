@@ -25,6 +25,7 @@ yarn add @diplodoc/mdx-extension
 - Built-in security with MDX input validation
 - Portal support for advanced component mounting with `withPortal`
 - Asynchronous component loading support via `idMdxComponentLoader`
+- Default component fallback for missing MDX references via `recmaDefaultComponent`
 
 ## Usage
 
@@ -40,6 +41,35 @@ import {mdxPlugin} from '@diplodoc/mdx-extension';
 const result = transform(markdownContent, {
   plugins: [...DefaultPlugins, mdxPlugin()],
 });
+```
+
+### Using Default Component Fallback
+
+The `recmaDefaultComponent` plugin provides graceful fallback for missing MDX component references. Instead of throwing errors, it redirects to a configurable default component.
+
+```typescript
+import {mdxPlugin, recmaDefaultComponent} from '@diplodoc/mdx-extension';
+
+const result = transform(markdownContent, {
+  plugins: [
+    ...DefaultPlugins,
+    mdxPlugin({
+      compileOptions: {
+        recmaPlugins: [recmaDefaultComponent({componentName: 'DefaultComponent'})],
+      },
+    }),
+  ],
+});
+```
+
+Example default component:
+
+```tsx
+const Components = {
+  DefaultComponent: ({tagName, ...props}) => (
+    <div style={{border: '1px dashed red'}}>Missing component: {tagName}</div>
+  ),
+};
 ```
 
 ### Enabling MDX Input Validation

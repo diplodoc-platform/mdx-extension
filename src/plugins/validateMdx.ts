@@ -158,6 +158,10 @@ function validateAST(ast: Program): void {
             return;
         }
 
+        if (node.type === 'TemplateLiteral' && node.expressions.length === 0) {
+            return;
+        }
+
         throw new Error(`Component prop value type '${node.type}' is not allowed here`);
     }
 

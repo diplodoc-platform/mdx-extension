@@ -4,6 +4,7 @@ import transform from '@diplodoc/transform';
 import DefaultPlugins from '@diplodoc/transform/lib/plugins';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
+    getAsyncSsrRenderer,
     isWithMdxArtifacts,
     mdxPlugin,
     recmaDefaultComponent,
@@ -11,7 +12,6 @@ import {
     validateMdx,
 } from '@plugin';
 import {CONTEXT_LIST, PURE_COMPONENTS, SSR_COMPONENTS} from '@/components';
-import getAsyncSsrRenderer from '../../../../src/utils/getAsyncSsrRenderer';
 import {transform as swcTransform} from '@swc/core';
 
 export interface SsrRendererWorker {

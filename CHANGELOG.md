@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.9.0...v1.10.0) (2026-06-17)
+
+
+### Features
+
+* add recmaDefaultComponent plugin ([#83](https://github.com/diplodoc-platform/mdx-extension/issues/83)) ([13598ab](https://github.com/diplodoc-platform/mdx-extension/commit/13598abb47e5afb809e5aefe660c0f4ea570d220))
+
 ## [1.9.0](https://github.com/diplodoc-platform/mdx-extension/compare/v1.8.1...v1.9.0) (2026-05-04)
 
 

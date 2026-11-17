@@ -38,8 +38,8 @@
   ],
   "devDependencies": {
     "@commitlint/config-conventional": "^20.0.0",
-    "@diplodoc/components": "^4.28.5",
-    "@diplodoc/transform": "^4.57.3",
+    "@diplodoc/components": "^5.24.4",
+    "@diplodoc/transform": "^4.78.13",
     "@gravity-ui/browserslist-config": "^4.3.0",
     "@gravity-ui/eslint-config": "^3.2.0",
     "@gravity-ui/gulp-utils": "^1.0.3",
@@ -54,6 +54,7 @@
     "esbuild": "^0.25.5",
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.0.4",
+    "eslint-config-prettier": "^10.1.8",
     "fast-glob": "^3.3.3",
     "husky": "^9.1.7",
     "nano-staged": "^0.8.0",

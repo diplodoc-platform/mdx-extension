@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.2](https://github.com/diplodoc-platform/mdx-extension/compare/v1.10.1...v1.10.2) (2026-11-18)
+
+
+### Bug Fixes
+
+* trigger release ([0fcea37](https://github.com/diplodoc-platform/mdx-extension/commit/0fcea37315635201218631eaf76b206edb00551f))
+
 ## [1.10.1](https://github.com/diplodoc-platform/mdx-extension/compare/v1.10.0...v1.10.1) (2026-06-17)
 
 
